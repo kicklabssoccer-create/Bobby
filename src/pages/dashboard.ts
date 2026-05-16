@@ -205,16 +205,31 @@ const PAID_DRILLS_TODAY = [
   { title: 'Juggling Challenge', category: 'Ball Control', duration: '10 min', done: false },
 ];
 
-function initDashboard() {
-  const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
-  
+async function initDashboard() {
+  // Primary: check real server session via cookie
+  let user = null;
+  try {
+    const res = await fetch('/api/auth/me');
+    if (res.ok) {
+      const data = await res.json();
+      user = data.user;
+      // Keep localStorage in sync so nav updates correctly
+      localStorage.setItem('kicklab_user', JSON.stringify(user));
+    }
+  } catch(e) {}
+
+  // Fallback: use localStorage if API is unreachable (offline / network error)
+  if (!user) {
+    try { user = JSON.parse(localStorage.getItem('kicklab_user') || 'null'); } catch(e) {}
+  }
+
   document.getElementById('dashboard-loading').style.display = 'none';
-  
+
   if (!user) {
     document.getElementById('dashboard-guest').classList.remove('hidden');
     return;
   }
-  
+
   document.getElementById('dashboard-main').classList.remove('hidden');
   
   // Update user info

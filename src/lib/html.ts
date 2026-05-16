@@ -211,12 +211,16 @@ export function nav(activePath: string = '/') {
 function kicklabGetUser() {
   try { return JSON.parse(localStorage.getItem('kicklab_user') || 'null'); } catch { return null; }
 }
-function kicklabLogout() {
+
+async function kicklabLogout() {
+  // Clear server session cookie first
+  try { await fetch('/api/auth/logout', { method: 'POST' }); } catch(e) {}
+  // Then clear local cache
   localStorage.removeItem('kicklab_user');
   window.location.href = '/';
 }
-function kicklabUpdateNav() {
-  const user = kicklabGetUser();
+
+function _applyNavUser(user) {
   const signIn = document.getElementById('nav-signin-btn');
   const getStarted = document.getElementById('nav-getstarted-btn');
   const dashboard = document.getElementById('nav-dashboard-btn');
@@ -230,6 +234,35 @@ function kicklabUpdateNav() {
     if (nameEl) nameEl.textContent = user.name ? user.name.split(' ')[0] : 'Account';
     if (mobileAuth) mobileAuth.classList.add('hidden');
     if (mobileUser) mobileUser.classList.remove('hidden');
+  } else {
+    // Ensure logged-out state is visible
+    if (signIn) signIn.classList.remove('hidden');
+    if (getStarted) getStarted.classList.remove('hidden');
+    if (dashboard) { dashboard.classList.add('hidden'); dashboard.classList.remove('flex'); }
+    if (mobileAuth) mobileAuth.classList.remove('hidden');
+    if (mobileUser) mobileUser.classList.add('hidden');
+  }
+}
+
+async function kicklabUpdateNav() {
+  // Optimistic: use localStorage immediately so nav doesn't flicker
+  const cached = kicklabGetUser();
+  if (cached) _applyNavUser(cached);
+
+  // Then verify with server session (handles new device / cleared cache)
+  try {
+    const res = await fetch('/api/auth/me');
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('kicklab_user', JSON.stringify(data.user));
+      _applyNavUser(data.user);
+    } else {
+      // Server says not logged in — clear stale localStorage and update nav
+      localStorage.removeItem('kicklab_user');
+      _applyNavUser(null);
+    }
+  } catch(e) {
+    // Network error — keep whatever cached state we showed
   }
 }
 document.addEventListener('DOMContentLoaded', kicklabUpdateNav);
