@@ -10,13 +10,13 @@ export function pricingPage() {
     <div class="text-center mb-16">
       <div class="text-accent-400 text-sm font-semibold uppercase tracking-wider mb-3">Subscription Plans</div>
       <h1 class="font-oswald text-5xl font-bold text-white mb-4">TRAIN AT YOUR<br/><span class="gradient-text">OWN PACE.</span></h1>
-      <p class="text-gray-400 max-w-2xl mx-auto">Start free, upgrade when you're ready. Pay your way — Credit Card, Venmo, Zelle, or PayPal.</p>
+      <p class="text-gray-400 max-w-2xl mx-auto">Start free, upgrade when you're ready. Pay securely via Venmo.</p>
 
-      <!-- Payment methods -->
-      <div class="flex flex-wrap justify-center gap-2 mt-6">
-        ${[['💳', 'Credit Card'], ['📱', 'Venmo'], ['📲', 'Zelle'], ['🅿️', 'PayPal']].map(([icon, label]) =>
-          `<span class="bg-panel border border-white/10 text-gray-300 text-sm font-medium px-4 py-1.5 rounded-full flex items-center gap-1.5">${icon} ${label}</span>`
-        ).join('')}
+      <!-- Payment method -->
+      <div class="flex justify-center mt-6">
+        <span class="bg-panel border border-white/10 text-gray-300 text-sm font-medium px-5 py-2 rounded-full flex items-center gap-2">
+          <span class="text-xl">📱</span> Venmo
+        </span>
       </div>
     </div>
 
@@ -38,14 +38,14 @@ export function pricingPage() {
           <div class="text-2xl mb-2">👀</div>
           <div class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">FREE</div>
           <h3 class="font-oswald text-2xl font-bold text-white mb-1">Free</h3>
-          <p class="text-gray-500 text-sm">Preview the platform — no credit card needed.</p>
+          <p class="text-gray-500 text-sm">Preview the platform — no payment needed.</p>
         </div>
         <div class="mb-6">
           <span class="font-oswald text-4xl font-bold text-white">$0</span>
           <span class="text-gray-500 text-sm">/mo</span>
         </div>
         <ul class="space-y-2.5 mb-6 flex-1">
-          ${['3 beginner drills (free forever)', '2 free preview videos', 'Progress tracker (limited)', 'Program overviews', 'No credit card required'].map(f =>
+          ${['3 beginner drills (free forever)', '2 free preview videos', 'Progress tracker (limited)', 'Program overviews', 'No payment required'].map(f =>
             `<li class="flex items-start gap-2 text-sm"><i class="fas fa-check text-green-400 text-xs mt-0.5 flex-shrink-0"></i><span class="text-gray-300">${f}</span></li>`
           ).join('')}
         </ul>
@@ -61,7 +61,7 @@ export function pricingPage() {
           <p class="text-gray-500 text-sm">Perfect for beginners building their foundation.</p>
         </div>
         <div class="mb-6">
-          <span class="font-oswald text-4xl font-bold text-white" data-monthly="$9.99" data-annual="$7.99">$9.99</span>
+          <span class="font-oswald text-4xl font-bold text-white" data-monthly="9.99" data-annual="7.99">$9.99</span>
           <span class="text-gray-500 text-sm">/mo</span>
           <div class="text-gray-600 text-xs mt-1" id="starter-savings" style="display:none">Save $24 per year</div>
         </div>
@@ -83,7 +83,7 @@ export function pricingPage() {
           <p class="text-gray-500 text-sm">For developing players ready to level up.</p>
         </div>
         <div class="mb-6">
-          <span class="font-oswald text-4xl font-bold text-white" data-monthly="$19.99" data-annual="$15.99">$19.99</span>
+          <span class="font-oswald text-4xl font-bold text-white" data-monthly="19.99" data-annual="15.99">$19.99</span>
           <span class="text-gray-500 text-sm">/mo</span>
           <div class="text-gray-600 text-xs mt-1" id="pro-savings" style="display:none">Save $48 per year</div>
         </div>
@@ -104,7 +104,7 @@ export function pricingPage() {
           <p class="text-gray-500 text-sm">Complete access for the most serious players.</p>
         </div>
         <div class="mb-6">
-          <span class="font-oswald text-4xl font-bold text-white" data-monthly="$34.99" data-annual="$27.99">$34.99</span>
+          <span class="font-oswald text-4xl font-bold text-white" data-monthly="34.99" data-annual="27.99">$34.99</span>
           <span class="text-gray-500 text-sm">/mo</span>
           <div class="text-gray-600 text-xs mt-1" id="elite-savings" style="display:none">Save $84 per year</div>
         </div>
@@ -117,12 +117,12 @@ export function pricingPage() {
       </div>
     </div>
 
-    <!-- Trial / guarantees -->
+    <!-- Guarantees -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
       ${[
-        { icon: 'fas fa-shield-alt', title: '7-Day Free Trial', desc: 'Try any paid plan risk-free', color: 'text-green-400' },
-        { icon: 'fas fa-times-circle', title: 'Cancel Anytime', desc: 'No lock-in contracts', color: 'text-accent-400' },
-        { icon: 'fas fa-lock', title: 'Secure Payments', desc: 'Card, Venmo & Zelle accepted', color: 'text-purple-400' },
+        { icon: 'fas fa-shield-alt', title: '7-Day Free Trial',  desc: 'Try any paid plan risk-free',    color: 'text-green-400'  },
+        { icon: 'fas fa-times-circle', title: 'Cancel Anytime', desc: 'No lock-in contracts',           color: 'text-accent-400' },
+        { icon: 'fas fa-mobile-alt',   title: 'Pay via Venmo',  desc: 'Fast, simple, secure payments',  color: 'text-[#008CFF]'  },
       ].map(g => `
         <div class="bg-panel border border-white/5 rounded-xl p-5 flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"><i class="${g.icon} ${g.color}"></i></div>
@@ -147,20 +147,20 @@ export function pricingPage() {
           </thead>
           <tbody class="divide-y divide-white/5">
             ${[
-              ['Beginner Drills', '5 only', '48', '48', '48'],
-              ['Intermediate Drills', '—', '—', '64', '64'],
-              ['Advanced Drills', '—', '—', '—', '80+'],
-              ['Beginner Videos', '2 previews', '32', '32', '32'],
-              ['Intermediate Videos', '—', '—', '48', '48'],
-              ['Advanced Videos', '—', '—', '—', '40+'],
-              ['Foundation Builder', '—', '✅', '✅', '✅'],
-              ['Skill Accelerator', '—', '—', '✅', '✅'],
-              ['Elite Performance', '—', '—', '—', '✅'],
-              ['Weekly Training Plan', '—', '✅', '✅', '✅'],
-              ['Progress Tracking', '—', '✅', '✅', '✅'],
-              ['Monthly Live Q&A', '—', '—', '✅', '✅'],
-              ['Coach Messaging', '—', '—', '—', '✅'],
-              ['Early Access Content', '—', '—', '—', '✅'],
+              ['Beginner Drills',       '5 only',    '48',  '48',  '48'  ],
+              ['Intermediate Drills',   '—',         '—',   '64',  '64'  ],
+              ['Advanced Drills',       '—',         '—',   '—',   '80+' ],
+              ['Beginner Videos',       '2 previews','32',  '32',  '32'  ],
+              ['Intermediate Videos',   '—',         '—',   '48',  '48'  ],
+              ['Advanced Videos',       '—',         '—',   '—',   '40+' ],
+              ['Foundation Builder',    '—',         '✅',  '✅',  '✅'  ],
+              ['Skill Accelerator',     '—',         '—',   '✅',  '✅'  ],
+              ['Elite Performance',     '—',         '—',   '—',   '✅'  ],
+              ['Weekly Training Plan',  '—',         '✅',  '✅',  '✅'  ],
+              ['Progress Tracking',     '—',         '✅',  '✅',  '✅'  ],
+              ['Monthly Live Q&A',      '—',         '—',   '✅',  '✅'  ],
+              ['Coach Messaging',       '—',         '—',   '—',   '✅'  ],
+              ['Early Access Content',  '—',         '—',   '—',   '✅'  ],
             ].map(([feature, ...vals]) => `
               <tr class="hover:bg-white/[0.02] transition-colors">
                 <td class="p-4 text-gray-300 text-sm">${feature}</td>
@@ -177,12 +177,12 @@ export function pricingPage() {
       <h2 class="font-oswald text-3xl font-bold text-white text-center mb-8">FREQUENTLY ASKED</h2>
       <div class="space-y-3" id="faq-list">
         ${[
-          ['Can I cancel at any time?', 'Yes — cancel anytime from your account settings. You keep access until the end of your billing period. No fees, no questions asked.'],
-          ['Is there a free trial?', 'Yes! All paid plans include a 7-day free trial. You won\'t be charged until the trial ends.'],
-          ['What payment methods do you accept?', 'We accept all major credit/debit cards, Venmo, Zelle, and PayPal. Pay the way that works for you.'],
-          ['How does Venmo payment work?', 'Select Venmo at checkout. We\'ll show you the exact amount and our Venmo handle (@kicklabs-soccer). Pay from your Venmo app, then submit your transaction ID. An admin manually verifies and activates your plan — usually within a few hours.'],
-          ['Can I upgrade or downgrade?', 'Absolutely. You can change your plan at any time. Upgrades are instant; downgrades take effect at the next billing cycle.'],
-          ['Do programs work for all ages?', 'Yes! Programs are designed for players aged 8 and up. Foundation Builder is ideal for younger players; Elite is for serious adult players.'],
+          ['Can I cancel at any time?',        'Yes — cancel anytime from your account settings. You keep access until the end of your billing period. No fees, no questions asked.'],
+          ['Is there a free trial?',           'Yes! All paid plans include a 7-day free trial. You won\'t be charged until the trial ends.'],
+          ['How do I pay?',                    'We accept Venmo. It\'s fast, easy, and secure. Just select your plan, send the payment to @kicklabs-soccer on Venmo, paste your transaction ID, and we\'ll activate your plan within a few hours.'],
+          ['How does the Venmo process work?', 'Click a plan, create your account, then send the exact amount to @kicklabs-soccer on Venmo with the note shown. Copy your Venmo transaction ID, paste it into the form, and submit. An admin verifies and activates your plan — usually within 2–4 hours.'],
+          ['Can I upgrade or downgrade?',      'Absolutely. You can change your plan at any time. Upgrades are instant; downgrades take effect at the next billing cycle.'],
+          ['Do programs work for all ages?',   'Yes! Programs are designed for players aged 8 and up. Foundation Builder is ideal for younger players; Elite is for serious adult players.'],
         ].map(([q, a], i) => `
           <div class="bg-panel border border-white/10 rounded-xl overflow-hidden">
             <button onclick="toggleFaq(${i})" class="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors">
@@ -199,94 +199,95 @@ export function pricingPage() {
   </div>
 </section>
 
-<!-- ============================================================
-     CHECKOUT MODAL — Multi-step with payment method selection
-     ============================================================ -->
+<!-- ── CHECKOUT MODAL — Venmo only ── -->
 <div id="checkout-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeCheckout()">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-lg mx-4 overflow-hidden" style="max-height:90vh;overflow-y:auto">
+
+    <!-- Modal header -->
     <div class="flex items-center justify-between p-5 border-b border-white/10 sticky top-0 bg-surface z-10">
       <h3 class="text-white font-bold text-lg" id="checkout-title">Subscribe</h3>
       <button onclick="closeCheckout()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
     </div>
 
-    <!-- Step 1: Account + Method Selection -->
+    <!-- Step 1: Account details -->
     <div id="checkout-step-1" class="p-6">
+
+      <!-- Plan summary -->
       <div id="checkout-plan-info" class="bg-panel rounded-xl p-4 mb-5"></div>
+
+      <!-- Venmo badge -->
+      <div class="flex items-center gap-3 bg-[#008CFF]/10 border border-[#008CFF]/30 rounded-xl px-4 py-3 mb-5">
+        <span class="text-2xl">📱</span>
+        <div>
+          <p class="text-white text-sm font-semibold">Pay with Venmo</p>
+          <p class="text-gray-400 text-xs">Send payment to <span class="text-[#008CFF] font-bold">@kicklabs-soccer</span> — activated within a few hours</p>
+        </div>
+      </div>
 
       <!-- Account fields -->
       <div class="space-y-3 mb-5">
         <div>
           <label class="block text-gray-400 text-xs font-medium mb-1">Email Address *</label>
-          <input type="email" placeholder="your@email.com" class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600" id="checkout-email">
+          <input type="email" id="checkout-email" placeholder="your@email.com"
+            class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600">
         </div>
         <div>
           <label class="block text-gray-400 text-xs font-medium mb-1">Full Name *</label>
-          <input type="text" placeholder="Your full name" class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600" id="checkout-name">
+          <input type="text" id="checkout-name" placeholder="Your full name"
+            class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600">
         </div>
         <div>
           <label class="block text-gray-400 text-xs font-medium mb-1">Password * (min 8 chars)</label>
-          <input type="password" placeholder="Create a password" class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600" id="checkout-pass">
-        </div>
-      </div>
-
-      <!-- Payment method selection -->
-      <div class="mb-5">
-        <label class="block text-gray-400 text-xs font-medium mb-3">Choose Payment Method</label>
-        <div class="grid grid-cols-2 gap-2" id="payment-method-grid">
-          <button onclick="selectMethod('venmo')" id="method-venmo" class="method-btn flex items-center gap-2 border border-white/10 bg-panel hover:border-accent-600/40 rounded-xl p-3 text-left transition-all">
-            <span class="text-xl">📱</span>
-            <div><div class="text-white text-sm font-medium">Venmo</div><div class="text-gray-600 text-xs">Manual verify</div></div>
-          </button>
-          <button onclick="selectMethod('zelle')" id="method-zelle" class="method-btn flex items-center gap-2 border border-white/10 bg-panel hover:border-accent-600/40 rounded-xl p-3 text-left transition-all">
-            <span class="text-xl">📲</span>
-            <div><div class="text-white text-sm font-medium">Zelle</div><div class="text-gray-600 text-xs">Manual verify</div></div>
-          </button>
-          <button onclick="selectMethod('paypal')" id="method-paypal" class="method-btn flex items-center gap-2 border border-white/10 bg-panel hover:border-accent-600/40 rounded-xl p-3 text-left transition-all">
-            <span class="text-xl">🅿️</span>
-            <div><div class="text-white text-sm font-medium">PayPal</div><div class="text-gray-600 text-xs">Manual verify</div></div>
-          </button>
-          <button onclick="selectMethod('card')" id="method-card" class="method-btn flex items-center gap-2 border border-white/10 bg-panel hover:border-accent-600/40 rounded-xl p-3 text-left transition-all">
-            <span class="text-xl">💳</span>
-            <div><div class="text-white text-sm font-medium">Credit Card</div><div class="text-gray-600 text-xs">Coming soon</div></div>
-          </button>
+          <input type="password" id="checkout-pass" placeholder="Create a password"
+            class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600">
         </div>
       </div>
 
       <div id="checkout-error" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-4 text-red-300 text-sm" style="display:none"></div>
 
-      <button onclick="proceedToPayment()" id="checkout-next-btn" class="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-3.5 rounded-xl transition-all text-sm">
-        Continue to Payment →
+      <button onclick="proceedToPayment()" id="checkout-next-btn"
+        class="w-full bg-[#008CFF] hover:bg-[#0070cc] text-white font-bold py-3.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+        <span class="text-lg">📱</span> Continue to Venmo Payment →
       </button>
       <p class="text-gray-700 text-xs text-center mt-3">By signing up you agree to our Terms & Privacy Policy</p>
     </div>
 
-    <!-- Step 2: Venmo / Zelle / PayPal Manual Payment -->
+    <!-- Step 2: Venmo payment instructions + TXN ID -->
     <div id="checkout-step-2" style="display:none" class="p-6">
+
+      <!-- Venmo instructions -->
       <div id="payment-instructions" class="mb-5"></div>
 
-      <!-- TXN ID submission -->
-      <div id="txn-section" class="mb-5">
-        <label class="block text-gray-400 text-xs font-medium mb-1">Transaction ID / Confirmation Number *</label>
-        <input type="text" id="txn-id" placeholder="Enter the transaction ID from your payment app"
+      <!-- TXN ID input -->
+      <div class="mb-5">
+        <label class="block text-gray-400 text-xs font-medium mb-1.5">
+          Transaction ID * <span class="text-gray-600 font-normal">(from your Venmo app after sending)</span>
+        </label>
+        <input type="text" id="txn-id" placeholder="e.g. 4056782930481234"
           class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600">
-        <p class="text-gray-600 text-xs mt-1.5">After sending payment, copy the transaction ID from your app and paste it here.</p>
+        <p class="text-gray-600 text-xs mt-1.5">
+          In Venmo: tap the payment → tap the three dots → copy the Transaction ID
+        </p>
       </div>
 
       <div id="checkout-error-2" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-4 text-red-300 text-sm" style="display:none"></div>
 
-      <button onclick="submitPayment()" id="submit-payment-btn" class="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-3.5 rounded-xl transition-all text-sm mb-3">
+      <button onclick="submitPayment()" id="submit-payment-btn"
+        class="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-3.5 rounded-xl transition-all text-sm mb-3">
         <i class="fas fa-paper-plane mr-2"></i>Submit for Verification
       </button>
-      <button onclick="goBackStep1()" class="w-full text-gray-500 hover:text-white text-sm py-2 transition-colors">← Change payment method</button>
+      <button onclick="goBackStep1()" class="w-full text-gray-500 hover:text-white text-sm py-2 transition-colors">
+        ← Go back
+      </button>
     </div>
 
-    <!-- Step 3: Success / Pending -->
+    <!-- Step 3: Submitted confirmation -->
     <div id="checkout-step-3" style="display:none" class="p-6 text-center">
       <div class="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
         <i class="fas fa-clock text-green-400 text-2xl"></i>
       </div>
       <h3 class="font-oswald text-2xl font-bold text-white mb-2">Payment Submitted!</h3>
-      <p class="text-gray-400 text-sm mb-5">Your payment is being verified. We'll activate your plan within a few hours and send you an email confirmation.</p>
+      <p class="text-gray-400 text-sm mb-5">Your Venmo payment is being verified. We'll activate your plan within a few hours.</p>
 
       <div id="pending-summary" class="bg-panel border border-white/10 rounded-xl p-4 mb-5 text-left"></div>
 
@@ -296,9 +297,9 @@ export function pricingPage() {
           <div class="text-left">
             <p class="text-yellow-300 text-sm font-medium mb-1">What happens next?</p>
             <ul class="text-gray-400 text-xs space-y-1">
-              <li>• An admin reviews your transaction ID</li>
+              <li>• An admin reviews your Venmo transaction ID</li>
               <li>• Your plan is activated (usually within 2–4 hours)</li>
-              <li>• You'll receive a confirmation email</li>
+              <li>• You can log in right away — plan activates automatically</li>
             </ul>
           </div>
         </div>
@@ -308,82 +309,26 @@ export function pricingPage() {
         Go to Dashboard →
       </a>
     </div>
+
   </div>
 </div>
 
 <script>
 let currentBilling = 'monthly';
-let currentPlan = 'pro';
-let selectedMethod = null;
-let _paymentId = null;
-let _venmoUrl = null;
+let currentPlan    = 'pro';
+let _paymentId     = null;
 
 const planData = {
-  starter: { name: 'Starter', emoji: '🌱', monthly: '9.99', annual: '7.99', color: 'text-green-400' },
+  starter: { name: 'Starter', emoji: '🌱', monthly: '9.99',  annual: '7.99',  color: 'text-green-400'  },
   pro:     { name: 'Pro',     emoji: '⚡', monthly: '19.99', annual: '15.99', color: 'text-accent-400' },
-  elite:   { name: 'Elite',  emoji: '🏆', monthly: '34.99', annual: '27.99', color: 'text-yellow-400' },
+  elite:   { name: 'Elite',   emoji: '🏆', monthly: '34.99', annual: '27.99', color: 'text-yellow-400' },
 };
 
-const methodInstructions = {
-  venmo: (amount, plan) => \`
-    <div class="bg-[#008CFF]/10 border border-[#008CFF]/30 rounded-xl p-5 text-center mb-4">
-      <div class="text-4xl mb-2">📱</div>
-      <h4 class="text-white font-bold text-lg mb-1">Pay via Venmo</h4>
-      <p class="text-gray-400 text-sm mb-4">Send <span class="text-white font-bold text-xl">$\${amount}</span> to <span class="text-[#008CFF] font-bold">@kicklabs-soccer</span></p>
-      <a id="venmo-deep-link" href="venmo://paycharge?txn=pay&recipients=kicklabs-soccer&amount=\${amount}&note=Kicklab+\${plan}+Subscription" 
-         class="inline-flex items-center gap-2 bg-[#008CFF] hover:bg-[#0070cc] text-white font-bold px-6 py-3 rounded-xl transition-all text-sm mb-3">
-        <i class="fas fa-external-link-alt"></i> Open Venmo App
-      </a>
-      <p class="text-gray-600 text-xs">Note to include: "Kicklab \${plan} Subscription"</p>
-    </div>
-    <div class="bg-panel border border-white/10 rounded-xl p-4 mb-4">
-      <p class="text-gray-400 text-xs"><strong class="text-white">Can't use the app button?</strong><br/>
-      Open Venmo manually → Search <strong class="text-[#008CFF]">@kicklabs-soccer</strong> → Send $\${amount} → Add note: "Kicklab \${plan} Subscription"</p>
-    </div>
-  \`,
-  zelle: (amount, plan) => \`
-    <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-5 text-center mb-4">
-      <div class="text-4xl mb-2">📲</div>
-      <h4 class="text-white font-bold text-lg mb-1">Pay via Zelle</h4>
-      <p class="text-gray-400 text-sm mb-3">Send <span class="text-white font-bold text-xl">$\${amount}</span> to:</p>
-      <div class="bg-panel rounded-xl p-3 mb-3">
-        <p class="text-purple-300 font-bold text-lg">kicklabs.soccer@gmail.com</p>
-        <p class="text-gray-500 text-xs mt-1">Memo: Kicklab \${plan} Subscription</p>
-      </div>
-    </div>
-    <div class="bg-panel border border-white/10 rounded-xl p-4 mb-4">
-      <p class="text-gray-400 text-xs"><strong class="text-white">How to pay with Zelle:</strong><br/>
-      Open your bank app → Zelle → Send to <strong class="text-purple-300">kicklabs.soccer@gmail.com</strong> → Amount: $\${amount}</p>
-    </div>
-  \`,
-  paypal: (amount, plan) => \`
-    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 text-center mb-4">
-      <div class="text-4xl mb-2">🅿️</div>
-      <h4 class="text-white font-bold text-lg mb-1">Pay via PayPal</h4>
-      <p class="text-gray-400 text-sm mb-3">Send <span class="text-white font-bold text-xl">$\${amount}</span> to:</p>
-      <div class="bg-panel rounded-xl p-3 mb-3">
-        <p class="text-blue-300 font-bold text-lg">kicklabs.soccer@gmail.com</p>
-        <p class="text-gray-500 text-xs mt-1">Select "Friends & Family" · Note: Kicklab \${plan} Subscription</p>
-      </div>
-      <a href="https://paypal.me/kicklabsoccer/\${amount}" target="_blank"
-         class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-all text-sm">
-        <i class="fas fa-external-link-alt"></i> Open PayPal.me
-      </a>
-    </div>
-  \`,
-  card: (amount) => \`
-    <div class="bg-gray-500/10 border border-gray-500/30 rounded-xl p-5 text-center mb-4">
-      <div class="text-4xl mb-2">💳</div>
-      <h4 class="text-white font-bold text-lg mb-2">Credit Card</h4>
-      <p class="text-gray-400 text-sm">Card payments are coming soon. Please use Venmo, Zelle, or PayPal for now.</p>
-    </div>
-  \`,
-};
-
+// ── Billing toggle ───────────────────────────────────────────────
 function setBilling(mode) {
   currentBilling = mode;
-  document.getElementById('billing-monthly').className = 'px-5 py-2 rounded-full text-sm font-semibold transition-all ' + (mode==='monthly'?'tab-active':'tab-inactive');
-  document.getElementById('billing-annual').className = 'px-5 py-2 rounded-full text-sm font-semibold transition-all ' + (mode==='annual'?'tab-active':'tab-inactive') + ' flex items-center gap-2';
+  document.getElementById('billing-monthly').className = 'px-5 py-2 rounded-full text-sm font-semibold transition-all ' + (mode==='monthly' ? 'tab-active' : 'tab-inactive');
+  document.getElementById('billing-annual').className  = 'px-5 py-2 rounded-full text-sm font-semibold transition-all ' + (mode==='annual'  ? 'tab-active' : 'tab-inactive') + ' flex items-center gap-2';
   document.querySelectorAll('[data-monthly]').forEach(el => {
     el.textContent = '$' + (mode === 'monthly' ? el.dataset.monthly : el.dataset.annual);
   });
@@ -393,29 +338,27 @@ function setBilling(mode) {
   });
 }
 
+// ── Open checkout ────────────────────────────────────────────────
 function openCheckout(plan) {
   currentPlan = plan;
-  selectedMethod = null;
-  _paymentId = null;
-  const p = planData[plan];
+  _paymentId  = null;
+  const p     = planData[plan];
   const price = currentBilling === 'monthly' ? p.monthly : p.annual;
+
   document.getElementById('checkout-title').textContent = p.emoji + ' ' + p.name + ' Plan';
   document.getElementById('checkout-plan-info').innerHTML =
     '<div class="flex items-center justify-between">' +
-    '<span class="text-gray-300 text-sm">' + p.name + ' Plan (' + currentBilling + ')</span>' +
-    '<span class="font-bold text-white text-lg">$' + price + '/mo</span></div>' +
+      '<span class="text-gray-300 text-sm">' + p.name + ' Plan (' + currentBilling + ')</span>' +
+      '<span class="font-bold text-white text-lg">$' + price + '/mo</span>' +
+    '</div>' +
     '<div class="mt-1 text-gray-600 text-xs">7-day free trial included — charged after trial ends</div>';
-  // Reset all steps
+
+  // Reset to step 1
   document.getElementById('checkout-step-1').style.display = 'block';
   document.getElementById('checkout-step-2').style.display = 'none';
   document.getElementById('checkout-step-3').style.display = 'none';
-  document.getElementById('checkout-error').style.display = 'none';
-  // Remove method highlights
-  document.querySelectorAll('.method-btn').forEach(b => {
-    b.style.borderColor = '';
-    b.classList.remove('border-accent-600');
-  });
-  document.getElementById('checkout-modal').style.display = 'flex';
+  document.getElementById('checkout-error').style.display  = 'none';
+  document.getElementById('checkout-modal').style.display  = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
@@ -424,15 +367,7 @@ function closeCheckout() {
   document.body.style.overflow = '';
 }
 
-function selectMethod(method) {
-  selectedMethod = method;
-  document.querySelectorAll('.method-btn').forEach(b => {
-    b.style.borderColor = 'rgba(255,255,255,0.1)';
-  });
-  const btn = document.getElementById('method-' + method);
-  if (btn) btn.style.borderColor = '#2563eb';
-}
-
+// ── Step 1 → Step 2 ──────────────────────────────────────────────
 async function proceedToPayment() {
   const email = document.getElementById('checkout-email').value.trim();
   const name  = document.getElementById('checkout-name').value.trim();
@@ -440,88 +375,107 @@ async function proceedToPayment() {
   const errEl = document.getElementById('checkout-error');
 
   if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
-  if (!name) { errEl.textContent = 'Please enter your full name.'; errEl.style.display = 'block'; return; }
-  if (!pass || pass.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-  if (!selectedMethod) { errEl.textContent = 'Please select a payment method.'; errEl.style.display = 'block'; return; }
+  if (!name)                           { errEl.textContent = 'Please enter your full name.';       errEl.style.display = 'block'; return; }
+  if (!pass || pass.length < 8)        { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
 
-  const nextBtn = document.getElementById('checkout-next-btn');
-  nextBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up...';
-  nextBtn.disabled = true;
+  const btn = document.getElementById('checkout-next-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up…';
+  btn.disabled  = true;
 
   try {
-    // 1. Create account (or verify existing)
-    const signupRes = await fetch('/api/auth/signup', {
+    // 1. Create / verify account
+    const signupRes  = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name, password: pass, level: 'beginner', gender: 'prefer_not', age: '18_24', location: '', phone: '', venmoHandle: '' })
+      body: JSON.stringify({ email, name, password: pass, level: 'Beginner', gender: 'prefer_not', age: 'prefer_not', location: '', phone: '', venmoHandle: '' })
     });
     const signupData = await signupRes.json();
-    if (!signupRes.ok && !signupData.error?.includes('already')) {
+    if (!signupRes.ok && !signupData.error?.toLowerCase().includes('already')) {
       errEl.textContent = signupData.error || 'Could not create account.';
       errEl.style.display = 'block';
-      nextBtn.innerHTML = 'Continue to Payment →';
-      nextBtn.disabled = false;
+      btn.innerHTML = '<span class="text-lg">📱</span> Continue to Venmo Payment →';
+      btn.disabled  = false;
       return;
     }
 
-    // 2. Initiate payment
-    const p = planData[currentPlan];
+    // 2. Initiate payment record
+    const p      = planData[currentPlan];
     const amount = currentBilling === 'monthly' ? p.monthly : p.annual;
-    const payRes = await fetch('/api/payment/initiate', {
+    const payRes  = await fetch('/api/payment/initiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name, plan: currentPlan, amount, method: selectedMethod, billing: currentBilling })
+      body: JSON.stringify({ email, name, plan: currentPlan, amount, method: 'venmo', billing: currentBilling })
     });
     const payData = await payRes.json();
     if (!payRes.ok) {
       errEl.textContent = payData.error || 'Payment setup failed.';
       errEl.style.display = 'block';
-      nextBtn.innerHTML = 'Continue to Payment →';
-      nextBtn.disabled = false;
+      btn.innerHTML = '<span class="text-lg">📱</span> Continue to Venmo Payment →';
+      btn.disabled  = false;
       return;
     }
 
     _paymentId = payData.paymentId;
-    _venmoUrl  = payData.venmoUrl;
 
-    // 3. Show step 2
-    const instrFn = methodInstructions[selectedMethod];
-    document.getElementById('payment-instructions').innerHTML = instrFn ? instrFn(amount, p.name) : '';
+    // 3. Build Venmo instructions
+    const venmoNote = encodeURIComponent('Kicklabs ' + p.name + ' Subscription');
+    const venmoDeepLink = 'venmo://paycharge?txn=pay&recipients=kicklabs-soccer&amount=' + amount + '&note=' + venmoNote;
 
-    // Hide TXN section for card (not applicable)
-    document.getElementById('txn-section').style.display = selectedMethod === 'card' ? 'none' : 'block';
+    document.getElementById('payment-instructions').innerHTML = \`
+      <div class="bg-[#008CFF]/10 border border-[#008CFF]/30 rounded-xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">📱</div>
+        <h4 class="text-white font-bold text-lg mb-1">Send Payment on Venmo</h4>
+        <p class="text-gray-400 text-sm mb-1">Send exactly</p>
+        <p class="text-white font-bold text-3xl mb-3">$\${amount}</p>
+        <p class="text-gray-400 text-sm mb-4">to <span class="text-[#008CFF] font-bold text-base">@kicklabs-soccer</span></p>
+        <a href="\${venmoDeepLink}"
+           class="inline-flex items-center gap-2 bg-[#008CFF] hover:bg-[#0070cc] text-white font-bold px-6 py-3 rounded-xl transition-all text-sm mb-3">
+          <i class="fas fa-external-link-alt"></i> Open Venmo App
+        </a>
+        <p class="text-gray-600 text-xs">Include note: "Kicklabs \${p.name} Subscription"</p>
+      </div>
+      <div class="bg-panel border border-white/10 rounded-xl p-4 mb-4">
+        <p class="text-gray-400 text-xs leading-relaxed">
+          <strong class="text-white">Can't tap the button?</strong> Open Venmo →
+          search <strong class="text-[#008CFF]">@kicklabs-soccer</strong> →
+          send <strong class="text-white">$\${amount}</strong> →
+          add note: <em>"Kicklabs \${p.name} Subscription"</em>
+        </p>
+      </div>
+    \`;
 
     document.getElementById('checkout-step-1').style.display = 'none';
     document.getElementById('checkout-step-2').style.display = 'block';
-    document.getElementById('checkout-title').textContent = 'Complete Payment';
+    document.getElementById('checkout-title').textContent    = 'Complete Venmo Payment';
 
-  } catch(err) {
+  } catch (err) {
     errEl.textContent = 'Network error. Please try again.';
     errEl.style.display = 'block';
   }
 
-  nextBtn.innerHTML = 'Continue to Payment →';
-  nextBtn.disabled = false;
+  btn.innerHTML = '<span class="text-lg">📱</span> Continue to Venmo Payment →';
+  btn.disabled  = false;
 }
 
+// ── Step 2 → Step 3: submit TXN ID ───────────────────────────────
 async function submitPayment() {
   const txnId = document.getElementById('txn-id').value.trim();
   const errEl = document.getElementById('checkout-error-2');
 
-  if (selectedMethod !== 'card' && !txnId) {
-    errEl.textContent = 'Please enter your transaction ID.';
+  if (!txnId) {
+    errEl.textContent = 'Please enter your Venmo transaction ID.';
     errEl.style.display = 'block';
     return;
   }
   errEl.style.display = 'none';
 
-  const submitBtn = document.getElementById('submit-payment-btn');
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-  submitBtn.disabled = true;
+  const btn = document.getElementById('submit-payment-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+  btn.disabled  = true;
 
   try {
-    const res = await fetch('/api/payment/confirm-venmo', {
+    const res  = await fetch('/api/payment/confirm-venmo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ paymentId: _paymentId, txnId })
@@ -531,43 +485,39 @@ async function submitPayment() {
     if (!res.ok) {
       errEl.textContent = data.error || 'Submission failed. Please try again.';
       errEl.style.display = 'block';
-      submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit for Verification';
-      submitBtn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit for Verification';
+      btn.disabled  = false;
       return;
     }
 
-    // Show success step
-    const p = planData[currentPlan];
+    // Success summary
+    const p      = planData[currentPlan];
     const amount = currentBilling === 'monthly' ? p.monthly : p.annual;
-    const methodLabels = { venmo: 'Venmo', zelle: 'Zelle', paypal: 'PayPal', card: 'Credit Card' };
     document.getElementById('pending-summary').innerHTML =
       '<div class="space-y-2 text-sm">' +
-      '<div class="flex justify-between"><span class="text-gray-400">Plan</span><span class="text-white font-medium">' + p.emoji + ' ' + p.name + '</span></div>' +
-      '<div class="flex justify-between"><span class="text-gray-400">Amount</span><span class="text-white font-medium">$' + amount + '/mo</span></div>' +
-      '<div class="flex justify-between"><span class="text-gray-400">Method</span><span class="text-white font-medium">' + (methodLabels[selectedMethod] || selectedMethod) + '</span></div>' +
-      '<div class="flex justify-between"><span class="text-gray-400">Transaction ID</span><span class="text-gray-300 text-xs">' + (txnId || 'N/A') + '</span></div>' +
-      '<div class="flex justify-between"><span class="text-gray-400">Status</span><span class="text-yellow-400 font-medium">⏳ Pending Verification</span></div>' +
+        '<div class="flex justify-between"><span class="text-gray-400">Plan</span><span class="text-white font-medium">' + p.emoji + ' ' + p.name + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-gray-400">Amount</span><span class="text-white font-medium">$' + amount + '/mo</span></div>' +
+        '<div class="flex justify-between"><span class="text-gray-400">Method</span><span class="text-white font-medium">📱 Venmo</span></div>' +
+        '<div class="flex justify-between"><span class="text-gray-400">Transaction ID</span><span class="text-gray-300 font-mono text-xs">' + txnId + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-gray-400">Status</span><span class="text-yellow-400 font-medium">⏳ Pending Verification</span></div>' +
       '</div>';
 
     document.getElementById('checkout-step-2').style.display = 'none';
     document.getElementById('checkout-step-3').style.display = 'block';
-    document.getElementById('checkout-title').textContent = '✅ Payment Submitted';
+    document.getElementById('checkout-title').textContent    = '✅ Payment Submitted';
 
-    // Also store user in localStorage
-    localStorage.setItem('kicklab_user', JSON.stringify(data.user || { email: document.getElementById('checkout-email').value, plan: 'free' }));
-
-  } catch(err) {
+  } catch (err) {
     errEl.textContent = 'Network error. Please try again.';
     errEl.style.display = 'block';
-    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit for Verification';
-    submitBtn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit for Verification';
+    btn.disabled  = false;
   }
 }
 
 function goBackStep1() {
   document.getElementById('checkout-step-2').style.display = 'none';
   document.getElementById('checkout-step-1').style.display = 'block';
-  document.getElementById('checkout-title').textContent = planData[currentPlan].emoji + ' ' + planData[currentPlan].name + ' Plan';
+  document.getElementById('checkout-title').textContent    = planData[currentPlan].emoji + ' ' + planData[currentPlan].name + ' Plan';
 }
 
 function toggleFaq(i) {
