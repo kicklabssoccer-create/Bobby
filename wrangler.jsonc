@@ -11,5 +11,8 @@
       "binding": "KICKLAB_KV",
       "id": "ff330f2426bb476db92edeba78d3fcb8"
     }
-  ]
+  ],
+  "vars": {
+    "MAILCHIMP_SERVER": "us16"
+  }
 }

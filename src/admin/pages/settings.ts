@@ -172,38 +172,77 @@ export function adminSettingsPage(): string {
       </div>
     </div>
 
-    <!-- Integrations -->
+    <!-- Mailchimp Email Marketing -->
     <div class="bg-slate-800 border border-white/6 rounded-2xl overflow-hidden">
-      <div class="px-5 py-4 border-b border-white/8 flex items-center gap-2">
-        <i class="fas fa-plug text-accent-400"></i>
-        <h3 class="text-white font-semibold">Integrations</h3>
+      <div class="px-5 py-4 border-b border-white/8 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-envelope-open-text text-yellow-400"></i>
+          <h3 class="text-white font-semibold">Email Marketing — Mailchimp</h3>
+        </div>
+        <span class="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-green-500/15 text-green-400 border border-green-500/20">
+          ✓ Connected
+        </span>
       </div>
-      <div class="p-5 space-y-4">
-        ${[
-          { icon: 'fab fa-google', name: 'Google Analytics', field: 'ga-key', placeholder: 'G-XXXXXXXXXX', status: 'connected', color: 'yellow' },
-          { icon: 'fab fa-stripe-s', name: 'Stripe Payments', field: 'stripe-key', placeholder: 'sk_live_…', status: 'connected', color: 'purple' },
-          { icon: 'fab fa-amazon', name: 'Amazon Affiliates', field: 'amazon-tag', placeholder: 'kicklab-21', status: 'connected', color: 'orange' },
-          { icon: 'fab fa-mailchimp', name: 'Email Marketing', field: 'email-key', placeholder: 'API key…', status: 'not connected', color: 'slate' },
-        ].map(intg => `
-        <div class="flex items-center gap-4 bg-white/5 rounded-xl p-4">
-          <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="${intg.icon} text-lg ${intg.color === 'yellow' ? 'text-yellow-400' : intg.color === 'purple' ? 'text-purple-400' : intg.color === 'orange' ? 'text-orange-400' : 'text-slate-400'}"></i>
+      <div class="p-5 space-y-5">
+
+        <!-- Live stats row -->
+        <div class="grid grid-cols-3 gap-3" id="mc-stats-row">
+          <div class="bg-white/5 rounded-xl p-3 text-center">
+            <div class="text-xl font-bold text-white" id="mc-members">—</div>
+            <div class="text-slate-400 text-xs mt-0.5">Subscribers</div>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="text-white text-sm font-medium">${intg.name}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${intg.status === 'connected' ? 'bg-green-500/15 text-green-400' : 'bg-white/5 text-slate-400'}">
-                ${intg.status}
-              </span>
-            </div>
-            <input type="password" placeholder="${intg.placeholder}"
-                   class="mt-1.5 w-full bg-transparent border-b border-white/10 pb-0.5 text-slate-400 text-xs focus:border-accent-600 transition-all outline-none"/>
+          <div class="bg-white/5 rounded-xl p-3 text-center">
+            <div class="text-xl font-bold text-green-400" id="mc-open-rate">—</div>
+            <div class="text-slate-400 text-xs mt-0.5">Open Rate</div>
           </div>
-          <button onclick="showToast('${intg.name} settings saved!','success')"
-                  class="flex-shrink-0 text-accent-400 hover:text-accent-300 text-xs px-3 py-1.5 bg-accent-600/10 hover:bg-accent-600/20 rounded-lg transition-all font-medium">
-            Save
+          <div class="bg-white/5 rounded-xl p-3 text-center">
+            <div class="text-xl font-bold text-accent-400" id="mc-click-rate">—</div>
+            <div class="text-slate-400 text-xs mt-0.5">Click Rate</div>
+          </div>
+        </div>
+
+        <!-- Audience info -->
+        <div class="flex items-center justify-between bg-white/5 rounded-xl px-4 py-3">
+          <div>
+            <div class="text-white text-sm font-medium" id="mc-list-name">Loading...</div>
+            <div class="text-slate-400 text-xs">Audience: b886b81b7f · us16</div>
+          </div>
+          <button onclick="syncToMailchimp()" id="mc-sync-btn"
+            class="inline-flex items-center gap-1.5 bg-yellow-500/15 hover:bg-yellow-500/25 text-yellow-400 text-xs font-semibold px-3 py-2 rounded-lg border border-yellow-500/20 transition-all">
+            <i class="fas fa-sync-alt text-xs"></i> Sync All Users
           </button>
-        </div>`).join('')}
+        </div>
+
+        <!-- Send Campaign -->
+        <div class="border border-white/8 rounded-xl p-4 space-y-3">
+          <h4 class="text-white text-sm font-semibold flex items-center gap-2">
+            <i class="fas fa-paper-plane text-accent-400 text-xs"></i>
+            Send Email Campaign
+          </h4>
+          <div>
+            <label class="text-slate-400 text-xs font-semibold uppercase tracking-wider block mb-1.5">Subject Line</label>
+            <input type="text" id="mc-subject" placeholder="e.g. New drills added this week ⚽"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-500"/>
+          </div>
+          <div>
+            <label class="text-slate-400 text-xs font-semibold uppercase tracking-wider block mb-1.5">Preview Text</label>
+            <input type="text" id="mc-preview" placeholder="Short preview shown in inbox..."
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-500"/>
+          </div>
+          <div>
+            <label class="text-slate-400 text-xs font-semibold uppercase tracking-wider block mb-1.5">Email Body (HTML or plain text)</label>
+            <textarea id="mc-body" rows="5" placeholder="<h2>Hey {{FNAME}}!</h2><p>We just added 10 new drills...</p>"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-500 resize-none font-mono"></textarea>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <p class="text-slate-500 text-xs">Sends to all subscribers in your Mailchimp audience.</p>
+            <button onclick="sendCampaign()" id="mc-send-btn"
+              class="inline-flex items-center gap-2 bg-accent-600 hover:bg-accent-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-accent-600/20">
+              <i class="fas fa-paper-plane"></i> Send Now
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -224,7 +263,7 @@ export function adminSettingsPage(): string {
           { name: 'D1 Database', status: 'Operational', ok: true },
           { name: 'KV Storage', status: 'Operational', ok: true },
           { name: 'Video CDN', status: 'Operational', ok: true },
-          { name: 'Email Service', status: 'Degraded', ok: false },
+          { name: 'Email Service (Mailchimp)', status: 'Operational', ok: true },
           { name: 'Stripe API', status: 'Operational', ok: true },
         ].map(s => `
         <div class="flex items-center justify-between">
@@ -395,6 +434,74 @@ function toggleFeature(btn, label) {
 function saveFeatureFlags() {
   showToast('Feature flags saved!', 'success');
 }
+
+// ── Mailchimp ──────────────────────────────────────────────────────
+async function loadMailchimpStats() {
+  try {
+    const res = await fetch('/api/admin/mailchimp/stats');
+    if (!res.ok) return;
+    const d = await res.json();
+    document.getElementById('mc-members').textContent = (d.memberCount || 0).toLocaleString();
+    document.getElementById('mc-open-rate').textContent = (d.openRate || '0') + '%';
+    document.getElementById('mc-click-rate').textContent = (d.clickRate || '0') + '%';
+    document.getElementById('mc-list-name').textContent = d.listName || 'Kicklabs';
+  } catch(e) {}
+}
+
+async function syncToMailchimp() {
+  const btn = document.getElementById('mc-sync-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Syncing...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/admin/mailchimp/sync', { method: 'POST' });
+    const d = await res.json();
+    if (d.ok) {
+      showToast('Synced ' + d.total + ' users to Mailchimp! (' + d.added + ' new, ' + d.updated + ' updated)', 'success');
+      loadMailchimpStats();
+    } else {
+      showToast('Sync error: ' + (d.error || 'Unknown'), 'error');
+    }
+  } catch(e) {
+    showToast('Sync failed', 'error');
+  }
+  btn.innerHTML = '<i class="fas fa-sync-alt text-xs"></i> Sync All Users';
+  btn.disabled = false;
+}
+
+async function sendCampaign() {
+  const subject = document.getElementById('mc-subject').value.trim();
+  const previewText = document.getElementById('mc-preview').value.trim();
+  const body = document.getElementById('mc-body').value.trim();
+  if (!subject) { showToast('Subject line is required', 'error'); return; }
+  if (!body) { showToast('Email body is required', 'error'); return; }
+
+  const btn = document.getElementById('mc-send-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/admin/mailchimp/campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, previewText, body }),
+    });
+    const d = await res.json();
+    if (d.ok) {
+      showToast('Campaign sent successfully to all subscribers! 🎉', 'success');
+      document.getElementById('mc-subject').value = '';
+      document.getElementById('mc-preview').value = '';
+      document.getElementById('mc-body').value = '';
+    } else {
+      showToast('Error: ' + (d.error || 'Campaign failed'), 'error');
+    }
+  } catch(e) {
+    showToast('Failed to send campaign', 'error');
+  }
+  btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Now';
+  btn.disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', loadMailchimpStats);
 </script>`
 
   return adminShell({ title: 'Settings', activePage: 'settings', body })

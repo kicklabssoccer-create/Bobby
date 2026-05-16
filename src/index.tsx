@@ -13,7 +13,12 @@ import {
   type KickUser, type KickPayment,
 } from './lib/kv'
 
-type Bindings = { KICKLAB_KV: KVNamespace }
+type Bindings = {
+  KICKLAB_KV: KVNamespace
+  MAILCHIMP_API_KEY: string
+  MAILCHIMP_AUDIENCE_ID: string
+  MAILCHIMP_SERVER: string
+}
 
 // Public pages
 import { homePage } from './pages/home'
@@ -202,6 +207,26 @@ app.post('/api/auth/signup', async (c) => {
     await saveUser(kv, user)
     const token = await createSession(kv, email)
     const { passwordHash: _, ...safeUser } = user
+    // Auto-subscribe to Mailchimp (fire and forget — don't block signup)
+    if (c.env.MAILCHIMP_API_KEY && c.env.MAILCHIMP_AUDIENCE_ID) {
+      const server = c.env.MAILCHIMP_SERVER || 'us16'
+      fetch(`https://${server}.api.mailchimp.com/3.0/lists/${c.env.MAILCHIMP_AUDIENCE_ID}/members`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa('anystring:' + c.env.MAILCHIMP_API_KEY)}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email_address: user.email,
+          status: 'subscribed',
+          merge_fields: {
+            FNAME: user.name.split(' ')[0] || user.name,
+            LNAME: user.name.split(' ').slice(1).join(' ') || '',
+          },
+          tags: [user.plan, user.level || 'beginner'],
+        }),
+      }).catch(() => {}) // silent fail — never block signup
+    }
     return new Response(JSON.stringify({ ok: true, user: safeUser }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Set-Cookie': makeUserCookie(token) },
@@ -458,6 +483,146 @@ app.get('/api/admin/signups-daily', async (c) => {
   const raw = await kv.get('stats:signups_daily')
   const data = raw ? JSON.parse(raw) : {}
   return c.json({ ok: true, data })
+})
+
+// ─── MAILCHIMP INTEGRATION ───────────────────────────────────────
+
+// Helper: call Mailchimp API
+async function mailchimp(env: Bindings, method: string, path: string, body?: any) {
+  const server = env.MAILCHIMP_SERVER || 'us16'
+  const res = await fetch(`https://${server}.api.mailchimp.com/3.0${path}`, {
+    method,
+    headers: {
+      'Authorization': `Basic ${btoa('anystring:' + env.MAILCHIMP_API_KEY)}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  return res
+}
+
+// GET /api/admin/mailchimp/stats — list info + member count
+app.get('/api/admin/mailchimp/stats', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  try {
+    const res = await mailchimp(c.env, 'GET', `/lists/${c.env.MAILCHIMP_AUDIENCE_ID}`)
+    const data: any = await res.json()
+    return c.json({
+      ok: true,
+      listName: data.name,
+      memberCount: data.stats?.member_count || 0,
+      openRate: ((data.stats?.open_rate || 0) * 100).toFixed(1),
+      clickRate: ((data.stats?.click_rate || 0) * 100).toFixed(1),
+      unsubscribeCount: data.stats?.unsubscribe_count || 0,
+    })
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// POST /api/admin/mailchimp/sync — bulk sync all KV users to Mailchimp
+app.post('/api/admin/mailchimp/sync', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  try {
+    const users = await getAllUsers(kv)
+    const members = users.map(u => ({
+      email_address: u.email,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: u.name.split(' ')[0] || u.name,
+        LNAME: u.name.split(' ').slice(1).join(' ') || '',
+      },
+      tags: [u.plan, u.level || 'beginner'],
+    }))
+    const res = await mailchimp(c.env, 'POST', `/lists/${c.env.MAILCHIMP_AUDIENCE_ID}`, {
+      members,
+      update_existing: true,
+    })
+    const data: any = await res.json()
+    return c.json({
+      ok: true,
+      added: data.new_members?.length || 0,
+      updated: data.updated_members?.length || 0,
+      errors: data.errors?.length || 0,
+      total: users.length,
+    })
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// POST /api/admin/mailchimp/subscribe — add single user to Mailchimp
+// Called automatically on signup
+app.post('/api/admin/mailchimp/subscribe', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  try {
+    const { email, name, plan } = await c.req.json() as any
+    const res = await mailchimp(c.env, 'POST', `/lists/${c.env.MAILCHIMP_AUDIENCE_ID}/members`, {
+      email_address: email,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: name?.split(' ')[0] || '',
+        LNAME: name?.split(' ').slice(1).join(' ') || '',
+      },
+      tags: [plan || 'free'],
+    })
+    const data: any = await res.json()
+    if (res.ok) return c.json({ ok: true })
+    return c.json({ error: data.detail || 'Mailchimp error' }, 400)
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// POST /api/admin/mailchimp/campaign — create + send a campaign
+app.post('/api/admin/mailchimp/campaign', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  try {
+    const { subject, previewText, body } = await c.req.json() as any
+    if (!subject || !body) return c.json({ error: 'Subject and body required' }, 400)
+
+    // Step 1: Create campaign
+    const campaignRes = await mailchimp(c.env, 'POST', '/campaigns', {
+      type: 'regular',
+      recipients: { list_id: c.env.MAILCHIMP_AUDIENCE_ID },
+      settings: {
+        subject_line: subject,
+        preview_text: previewText || '',
+        from_name: 'Kicklab',
+        reply_to: 'kicklabs.soccer@gmail.com',
+      },
+    })
+    const campaign: any = await campaignRes.json()
+    if (!campaign.id) return c.json({ error: campaign.detail || 'Failed to create campaign' }, 400)
+
+    // Step 2: Set content
+    await mailchimp(c.env, 'PUT', `/campaigns/${campaign.id}/content`, {
+      html: `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#080e1a;color:#fff;padding:32px">
+        <div style="text-align:center;margin-bottom:32px">
+          <div style="background:#2563eb;width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:24px">⚽</div>
+          <h1 style="color:#fff;font-size:28px;margin:12px 0 4px">KICKLAB</h1>
+        </div>
+        ${body}
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:32px 0"/>
+        <p style="color:#6b7280;font-size:12px;text-align:center">
+          © 2026 Kicklab · <a href="*|UNSUB|*" style="color:#6b7280">Unsubscribe</a>
+        </p>
+      </body></html>`,
+    })
+
+    // Step 3: Send
+    await mailchimp(c.env, 'POST', `/campaigns/${campaign.id}/actions/send`)
+
+    return c.json({ ok: true, campaignId: campaign.id, message: 'Campaign sent successfully!' })
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
 })
 
 // ─── PUBLIC ROUTES ───────────────────────────────────────────────
