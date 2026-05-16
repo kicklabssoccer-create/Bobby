@@ -55,11 +55,13 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
         return `
           <div class="bg-panel border border-white/10 rounded-2xl overflow-hidden card-hover drill-card cursor-pointer ${!isFree ? 'drill-card-locked' : ''}"
                data-level="${d.level}" data-cat="${d.category}" data-plan="${d.plan}"
+               data-drill-id="${d.id}" data-drill-plan="${d.plan}"
                onclick="${isFree ? `openDrill('${d.id}')` : 'showUpgradePrompt()'}">
             <div class="p-5">
               <div class="flex items-start justify-between mb-3">
                 <span class="${badgeClass} text-xs font-semibold px-2 py-0.5 rounded-full">${d.level}</span>
-                ${!isFree ? '<i class="fas fa-lock text-gray-600 text-sm"></i>' : '<i class="fas fa-unlock text-green-400 text-sm"></i>'}
+                <span class="lock-icon" style="${isFree ? 'display:none' : ''}"><i class="fas fa-lock text-gray-600 text-sm"></i></span>
+                <span class="unlock-icon" style="${isFree ? '' : 'display:none'}"><i class="fas fa-unlock text-green-400 text-sm"></i></span>
               </div>
               <h3 class="text-white font-semibold text-sm mb-1 line-clamp-2">${d.title}</h3>
               <p class="text-accent-400 text-xs font-medium mb-3">${d.category}</p>
@@ -89,29 +91,58 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
 
 <!-- Drill Detail Modal -->
 <div id="drill-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeDrillModal()">
-  <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-xl mx-4 overflow-y-auto" style="max-height:90vh">
-    <div class="flex items-center justify-between p-5 border-b border-white/10">
+  <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-2xl mx-4 flex flex-col" style="max-height:92vh">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
       <div>
         <span id="modal-drill-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full badge-beginner"></span>
         <div id="modal-drill-category" class="text-gray-500 text-xs mt-1"></div>
       </div>
-      <button onclick="closeDrillModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+      <button onclick="closeDrillModal()" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"><i class="fas fa-times text-lg"></i></button>
     </div>
-    <div class="p-6">
-      <h2 id="modal-drill-title" class="font-oswald text-2xl font-bold text-white mb-2"></h2>
-      <p id="modal-drill-desc" class="text-gray-400 text-sm mb-5 leading-relaxed"></p>
-      <div class="grid grid-cols-3 gap-3 mb-6">
-        <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-clock"></i></div><div id="modal-drill-duration" class="text-white text-sm font-semibold"></div><div class="text-gray-600 text-xs">Duration</div></div>
-        <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-users"></i></div><div id="modal-drill-players" class="text-white text-sm font-semibold"></div><div class="text-gray-600 text-xs">Players</div></div>
-        <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-box"></i></div><div id="modal-drill-equipment" class="text-white text-xs font-semibold leading-tight"></div><div class="text-gray-600 text-xs">Equipment</div></div>
-      </div>
-      <div class="mb-5">
-        <h4 class="font-oswald text-lg font-bold text-white mb-3">STEPS</h4>
-        <ol id="modal-drill-steps" class="space-y-2"></ol>
-      </div>
-      <div>
-        <h4 class="font-oswald text-lg font-bold text-white mb-3">COACHING TIPS</h4>
-        <ul id="modal-drill-tips" class="space-y-2"></ul>
+    <!-- Scrollable content -->
+    <div class="overflow-y-auto flex-1">
+      <div class="p-6">
+        <h2 id="modal-drill-title" class="font-oswald text-2xl font-bold text-white mb-1"></h2>
+        <p id="modal-drill-desc" class="text-gray-400 text-sm mb-5 leading-relaxed"></p>
+        <!-- Stats row -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-clock"></i></div><div id="modal-drill-duration" class="text-white text-sm font-semibold"></div><div class="text-gray-600 text-xs">Duration</div></div>
+          <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-users"></i></div><div id="modal-drill-players" class="text-white text-sm font-semibold"></div><div class="text-gray-600 text-xs">Players</div></div>
+          <div class="bg-panel rounded-xl p-3 text-center"><div class="text-accent-400 text-lg mb-1"><i class="fas fa-box"></i></div><div id="modal-drill-equipment" class="text-white text-xs font-semibold leading-tight"></div><div class="text-gray-600 text-xs">Equipment</div></div>
+        </div>
+        <!-- VIDEO SECTION -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-oswald text-lg font-bold text-white flex items-center gap-2"><i class="fab fa-youtube text-red-500"></i> DRILL VIDEOS</h4>
+            <a id="modal-drill-yt-link" href="#" target="_blank" class="text-xs bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium transition-colors">
+              <i class="fab fa-youtube"></i> Open in YouTube
+            </a>
+          </div>
+          <div class="relative rounded-xl overflow-hidden bg-black" style="aspect-ratio:16/9">
+            <div id="drill-video-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 z-10">
+              <div class="w-8 h-8 border-2 border-accent-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+              <p class="text-gray-400 text-xs">Loading videos...</p>
+            </div>
+            <iframe id="drill-video-iframe"
+              width="100%" height="100%"
+              frameborder="0"
+              style="position:absolute;top:0;left:0;width:100%;height:100%"
+              onload="document.getElementById('drill-video-loading').style.display='none'">
+            </iframe>
+          </div>
+          <p class="text-gray-600 text-xs mt-2 flex items-center gap-1"><i class="fab fa-youtube text-red-500"></i> Live YouTube results — click any video to watch it</p>
+        </div>
+        <!-- Steps -->
+        <div class="mb-5">
+          <h4 class="font-oswald text-lg font-bold text-white mb-3">STEPS</h4>
+          <ol id="modal-drill-steps" class="space-y-2"></ol>
+        </div>
+        <!-- Tips -->
+        <div>
+          <h4 class="font-oswald text-lg font-bold text-white mb-3">COACHING TIPS</h4>
+          <ul id="modal-drill-tips" class="space-y-2"></ul>
+        </div>
       </div>
     </div>
   </div>
@@ -175,6 +206,13 @@ function openDrill(id) {
   document.getElementById('modal-drill-players').textContent = drill.players;
   document.getElementById('modal-drill-equipment').textContent = drill.equipment;
   
+  // Load YouTube search for this specific drill
+  var ytQuery = drill.title + ' soccer drill tutorial ' + drill.level;
+  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ytQuery);
+  document.getElementById('drill-video-iframe').src = ytUrl;
+  document.getElementById('modal-drill-yt-link').href = ytUrl;
+  document.getElementById('drill-video-loading').style.display = 'flex';
+  
   const stepsList = document.getElementById('modal-drill-steps');
   stepsList.innerHTML = drill.steps.map((s, i) => 
     '<li class="flex items-start gap-3"><span class="w-5 h-5 bg-accent-600/20 text-accent-400 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">' + (i+1) + '</span><span class="text-gray-300 text-sm">' + s + '</span></li>'
@@ -190,13 +228,13 @@ function openDrill(id) {
 }
 
 function closeDrillModal() {
+  document.getElementById('drill-video-iframe').src = '';
+  document.getElementById('drill-video-loading').style.display = 'flex';
   document.getElementById('drill-modal').style.display = 'none';
   document.body.style.overflow = '';
 }
 
 function showUpgradePrompt() {
-  const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
-  if (user && user.plan && user.plan !== 'free') return;
   document.getElementById('upgrade-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -206,22 +244,34 @@ function closeUpgradeModal() {
   document.body.style.overflow = '';
 }
 
-// Show/hide free notice based on auth
+// Plan tier order for access control
+var PLAN_ORDER = ['free','starter','pro','elite'];
+
+// Unlock drills based on user plan from localStorage
 document.addEventListener('DOMContentLoaded', () => {
   const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
+  const userPlan = (user && user.plan) ? user.plan : 'free';
+  const userTier = PLAN_ORDER.indexOf(userPlan);
   const notice = document.getElementById('free-notice');
-  if (user && user.plan && user.plan !== 'free') {
-    if (notice) notice.style.display = 'none';
-    // For paid users, make all drills clickable
-    document.querySelectorAll('.drill-card-locked').forEach(card => {
+
+  if (userTier > 0 && notice) notice.style.display = 'none';
+
+  // Unlock cards the user's plan covers
+  document.querySelectorAll('.drill-card').forEach(function(card) {
+    var cardPlan = card.dataset.drillPlan || 'free';
+    var cardTier = PLAN_ORDER.indexOf(cardPlan);
+    if (userTier >= cardTier) {
+      // User can access this drill
       card.classList.remove('drill-card-locked');
-      card.setAttribute('onclick', 'openDrill("' + card.dataset.plan + '")'); 
-    });
-    // Re-attach with correct drill ID by reworking approach
-    document.querySelectorAll('.drill-card[data-plan]').forEach(card => {
-      card.style.opacity = '1';
-    });
-  }
+      var drillId = card.dataset.drillId;
+      card.setAttribute('onclick', 'openDrill("' + drillId + '")');
+      // Show unlock icon
+      var lockIcon = card.querySelector('.lock-icon');
+      if (lockIcon) lockIcon.style.display = 'none';
+      var unlockIcon = card.querySelector('.unlock-icon');
+      if (unlockIcon) unlockIcon.style.display = 'inline';
+    }
+  });
 });
 
 document.addEventListener('keydown', e => {
