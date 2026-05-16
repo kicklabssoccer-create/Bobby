@@ -277,7 +277,7 @@ export function footer() {
         <div class="mb-4">${logo('md')}</div>
         <p class="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">Elite soccer training for all levels at kicklabssoccer.com. Start free, upgrade when you're ready. Follow us on Instagram for free daily tips!</p>
         <div class="flex gap-3">
-          <a href="https://instagram.com/kick.lab.soccer" target="_blank" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-pink-400 hover:bg-pink-400/10 transition-all"><i class="fab fa-instagram"></i></a>
+          <a href="https://instagram.com/kicklabs.soccer" target="_blank" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-pink-400 hover:bg-pink-400/10 transition-all"><i class="fab fa-instagram"></i></a>
           <a href="#" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all"><i class="fab fa-twitter"></i></a>
           <a href="#" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all"><i class="fab fa-youtube"></i></a>
           <a href="#" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-600/10 transition-all"><i class="fab fa-facebook"></i></a>

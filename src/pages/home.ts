@@ -283,15 +283,15 @@ export function homePage() {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <div class="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 rounded-full px-4 py-1.5 mb-6">
       <i class="fab fa-instagram text-pink-400"></i>
-      <span class="text-pink-400 text-sm font-medium">@kick.lab.soccer</span>
+      <span class="text-pink-400 text-sm font-medium">@kicklabs.soccer</span>
     </div>
     <h2 class="font-oswald text-4xl font-bold text-white mb-4">INSTAGRAM</h2>
     <p class="text-gray-400 text-lg mb-2">⚽ Daily drills, training tips & player highlights</p>
     <p class="text-gray-500 mb-8">Follow for free content → subscribe for full access</p>
-    <a href="https://instagram.com/kick.lab.soccer" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white font-bold px-8 py-4 rounded-xl text-base transition-all hover:opacity-90 hover:shadow-2xl hover:shadow-pink-500/20">
-      <i class="fab fa-instagram text-lg"></i> Follow @kick.lab.soccer
+    <a href="https://instagram.com/kicklabs.soccer" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white font-bold px-8 py-4 rounded-xl text-base transition-all hover:opacity-90 hover:shadow-2xl hover:shadow-pink-500/20">
+      <i class="fab fa-instagram text-lg"></i> Follow @kicklabs.soccer
     </a>
-    <p class="text-gray-600 text-sm mt-6">Follow <strong class="text-gray-400">@kick.lab.soccer</strong> for daily free drills, tutorials & challenges</p>
+    <p class="text-gray-600 text-sm mt-6">Follow <strong class="text-gray-400">@kicklabs.soccer</strong> for daily free drills, tutorials & challenges</p>
   </div>
 </section>
 
