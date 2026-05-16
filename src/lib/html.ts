@@ -278,16 +278,71 @@ export function footer() {
 }
 
 export function pageShell(opts: { title: string; description?: string; activePath?: string; body: string; extraHead?: string }) {
+  const desc = opts.description || 'Kicklab — elite soccer training programs, professional drills, and video tutorials for all skill levels.';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>${opts.title}</title>
-  <meta name="description" content="${opts.description || 'Kicklab — elite soccer training programs, professional drills, and video tutorials for all skill levels.'}"/>
+  <meta name="description" content="${desc}"/>
+
+  <!-- PWA / Theme -->
   <meta name="theme-color" content="#2563eb"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Kicklab"/>
+  <meta name="application-name" content="Kicklab"/>
+  <meta name="msapplication-TileColor" content="#2563eb"/>
+  <meta name="msapplication-TileImage" content="/static/icons/icon-144.png"/>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json"/>
+
+  <!-- Apple Touch Icons (iOS "Add to Home Screen") -->
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png"/>
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/icon-152.png"/>
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/icon-144.png"/>
+  <link rel="apple-touch-icon" sizes="128x128" href="/static/icons/icon-128.png"/>
+  <link rel="apple-touch-icon" sizes="96x96"  href="/static/icons/icon-96.png"/>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon-96.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/icon-72.png"/>
+
+  <!-- Open Graph (social sharing) -->
+  <meta property="og:title" content="${opts.title}"/>
+  <meta property="og:description" content="${desc}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="/static/icons/icon-512.png"/>
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:title" content="${opts.title}"/>
+  <meta name="twitter:description" content="${desc}"/>
+  <meta name="twitter:image" content="/static/icons/icon-512.png"/>
+
   ${GLOBAL_STYLES}
   ${opts.extraHead || ''}
+
+  <!-- PWA Install Banner styles -->
+  <style>
+    #pwa-install-banner {
+      position: fixed; bottom: 76px; left: 12px; right: 12px; z-index: 999;
+      background: linear-gradient(135deg, #1a2235, #0f1624);
+      border: 1px solid rgba(37,99,235,0.4);
+      border-radius: 16px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(37,99,235,0.2);
+      transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 440px; margin: 0 auto;
+    }
+    #pwa-install-banner.show { transform: translateY(0); }
+    @media (min-width: 768px) {
+      #pwa-install-banner { bottom: 24px; left: auto; right: 24px; max-width: 380px; margin: 0; }
+    }
+  </style>
 </head>
 <body class="bg-midnight text-white">
   ${nav(opts.activePath || '/')}
@@ -295,6 +350,95 @@ export function pageShell(opts: { title: string; description?: string; activePat
     ${opts.body}
   </main>
   ${footer()}
+
+  <!-- PWA Install Banner (shows on mobile after 3s if not installed) -->
+  <div id="pwa-install-banner" role="banner" aria-label="Install Kicklab app">
+    <div class="w-10 h-10 bg-accent-600 rounded-xl flex items-center justify-center flex-shrink-0">
+      <span class="text-xl">⚽</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-white text-sm font-bold leading-tight">Install Kicklab App</p>
+      <p class="text-gray-400 text-xs mt-0.5">Train anywhere — works offline too</p>
+    </div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <button id="pwa-install-btn" class="bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all">
+        Install
+      </button>
+      <button id="pwa-dismiss-btn" class="text-gray-500 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-all">
+        <i class="fas fa-times text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Service Worker + PWA Install Logic -->
+  <script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+
+  // PWA Install prompt
+  let _deferredPrompt = null;
+  const banner = document.getElementById('pwa-install-banner');
+  const installBtn = document.getElementById('pwa-install-btn');
+  const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+  // Check if already installed (standalone mode)
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+
+  // Don't show on desktop or if already installed or dismissed
+  const wasDismissed = localStorage.getItem('pwa_dismissed');
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    if (!isInstalled && !wasDismissed) {
+      setTimeout(() => banner && banner.classList.add('show'), 3000);
+    }
+  });
+
+  // iOS Safari: show manual "Add to Home Screen" instructions
+  function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
+  function isInStandaloneMode() { return window.navigator.standalone; }
+
+  if (isMobile && isIOS() && !isInStandaloneMode() && !wasDismissed) {
+    setTimeout(() => {
+      if (banner) {
+        banner.querySelector('p.text-xs').textContent = 'Tap Share → "Add to Home Screen"';
+        banner.classList.add('show');
+      }
+    }, 3000);
+  }
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (_deferredPrompt) {
+        _deferredPrompt.prompt();
+        const { outcome } = await _deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          banner.classList.remove('show');
+          localStorage.setItem('pwa_dismissed', '1');
+        }
+        _deferredPrompt = null;
+      } else if (isIOS()) {
+        // Show iOS instructions
+        installBtn.textContent = 'Tap Share → Add to Home';
+        installBtn.style.fontSize = '9px';
+      }
+    });
+  }
+
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      banner.classList.remove('show');
+      localStorage.setItem('pwa_dismissed', '1');
+    });
+  }
+  </script>
 </body>
 </html>`;
 }

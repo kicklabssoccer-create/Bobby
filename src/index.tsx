@@ -48,6 +48,69 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/favicon.svg', serveStatic({ root: './', path: '/public/favicon.svg' }))
 app.use('/manifest.json', serveStatic({ root: './', path: '/public/manifest.json' }))
+// Serve service worker with correct MIME type (must be at root scope)
+app.get('/sw.js', (c) => {
+  const swContent = `// Kicklab Service Worker — PWA offline support
+const CACHE_NAME = 'kicklab-v2';
+const PRECACHE_URLS = ['/','/drills','/videos','/programs','/pricing','/products','/dashboard'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {}))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/')) return;
+  event.respondWith(
+    fetch(event.request)
+      .then((res) => {
+        if (res && res.status === 200 && event.request.method === 'GET') {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+  );
+});
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  const data = event.data.json();
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Kicklab', {
+      body: data.body || 'Time to train! ⚽',
+      icon: '/static/icons/icon-192.png',
+      badge: '/static/icons/icon-96.png',
+      vibrate: [200, 100, 200],
+      data: { url: data.url || '/' },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/'));
+});`;
+  return new Response(swContent, {
+    headers: {
+      'Content-Type': 'application/javascript; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Service-Worker-Allowed': '/',
+    }
+  });
+})
 
 // ─── YOUTUBE TOP VIDEO API ───────────────────────────────────────
 // Returns the highest-view YouTube video ID for a given search query.
