@@ -8,6 +8,7 @@ import {
   getUser, saveUser, getAllUsers,
   savePayment, getPayment, getAllPayments,
   createSession, getSessionEmail, deleteSession,
+  createAdminSession, validateAdminSession, deleteAdminSession,
   computeStats,
   type KickUser, type KickPayment,
 } from './lib/kv'
@@ -29,8 +30,6 @@ import {
   ADMIN_USERNAME,
   ADMIN_PASSWORD,
   SESSION_COOKIE,
-  createSessionToken,
-  validateSessionToken,
 } from './admin/auth'
 import { adminLoginPage } from './admin/pages/login'
 import { adminDashboardPage } from './admin/pages/dashboard'
@@ -165,6 +164,14 @@ const USER_SESSION_COOKIE = 'kl_user_session'
 
 app.use('/api/*', cors())
 
+// Helper: build Set-Cookie header string
+function makeUserCookie(token: string): string {
+  return `${USER_SESSION_COOKIE}=${token}; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=Lax`
+}
+function clearUserCookie(): string {
+  return `${USER_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`
+}
+
 // POST /api/auth/signup
 app.post('/api/auth/signup', async (c) => {
   const kv = c.env.KICKLAB_KV
@@ -194,9 +201,11 @@ app.post('/api/auth/signup', async (c) => {
     }
     await saveUser(kv, user)
     const token = await createSession(kv, email)
-    setCookie(c, USER_SESSION_COOKIE, token, { httpOnly: true, secure: true, sameSite: 'Lax', maxAge: 86400, path: '/' })
     const { passwordHash: _, ...safeUser } = user
-    return c.json({ ok: true, user: safeUser })
+    return new Response(JSON.stringify({ ok: true, user: safeUser }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': makeUserCookie(token) },
+    })
   } catch (e: any) {
     return c.json({ error: e.message || 'Signup failed' }, 500)
   }
@@ -214,13 +223,14 @@ app.post('/api/auth/login', async (c) => {
     if (!user) return c.json({ error: 'No account found with that email' }, 401)
     const valid = await verifyPassword(password, user.passwordHash)
     if (!valid) return c.json({ error: 'Incorrect password' }, 401)
-    // Update lastLogin
     user.lastLogin = new Date().toISOString()
     await saveUser(kv, user)
     const token = await createSession(kv, email)
-    setCookie(c, USER_SESSION_COOKIE, token, { httpOnly: true, secure: true, sameSite: 'Lax', maxAge: 86400, path: '/' })
     const { passwordHash: _, ...safeUser } = user
-    return c.json({ ok: true, user: safeUser })
+    return new Response(JSON.stringify({ ok: true, user: safeUser }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': makeUserCookie(token) },
+    })
   } catch (e: any) {
     return c.json({ error: e.message || 'Login failed' }, 500)
   }
@@ -245,8 +255,10 @@ app.post('/api/auth/logout', async (c) => {
   const kv = c.env.KICKLAB_KV
   const token = getCookie(c, USER_SESSION_COOKIE)
   if (token && kv) await deleteSession(kv, token)
-  deleteCookie(c, USER_SESSION_COOKIE, { path: '/' })
-  return c.json({ ok: true })
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json', 'Set-Cookie': clearUserCookie() },
+  })
 })
 
 // ─── PAYMENT API ──────────────────────────────────────────────────
@@ -344,17 +356,19 @@ app.post('/api/payment/confirm-venmo', async (c) => {
 // ─── ADMIN DATA API ───────────────────────────────────────────────
 // All admin API routes require admin cookie auth
 
-function requireAdminAPI(c: any) {
+async function requireAdminAPI(c: any) {
   const token = getCookie(c, SESSION_COOKIE)
-  if (!token || !validateSessionToken(token)) {
-    return c.json({ error: 'Unauthorized' }, 401)
-  }
+  if (!token) return c.json({ error: 'Unauthorized' }, 401)
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const valid = await validateAdminSession(kv, token)
+  if (!valid) return c.json({ error: 'Unauthorized' }, 401)
   return null
 }
 
 // GET /api/admin/stats — dashboard numbers
 app.get('/api/admin/stats', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -365,7 +379,7 @@ app.get('/api/admin/stats', async (c) => {
 
 // GET /api/admin/users — full user list
 app.get('/api/admin/users', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -376,7 +390,7 @@ app.get('/api/admin/users', async (c) => {
 
 // GET /api/admin/payments — all payments with status
 app.get('/api/admin/payments', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -386,7 +400,7 @@ app.get('/api/admin/payments', async (c) => {
 
 // POST /api/admin/payment/approve — admin approves a Venmo payment
 app.post('/api/admin/payment/approve', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -409,7 +423,7 @@ app.post('/api/admin/payment/approve', async (c) => {
 
 // POST /api/admin/payment/reject
 app.post('/api/admin/payment/reject', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -423,7 +437,7 @@ app.post('/api/admin/payment/reject', async (c) => {
 
 // POST /api/admin/user/update-plan — manually change a user's plan
 app.post('/api/admin/user/update-plan', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -437,7 +451,7 @@ app.post('/api/admin/user/update-plan', async (c) => {
 
 // GET /api/admin/signups-daily — for chart data
 app.get('/api/admin/signups-daily', async (c) => {
-  const authErr = requireAdminAPI(c)
+  const authErr = await requireAdminAPI(c)
   if (authErr) return authErr
   const kv = c.env.KICKLAB_KV
   if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
@@ -471,99 +485,124 @@ app.get('/auth/signup', (c) => c.html(signupPage()))
 app.get('/dashboard', (c) => c.html(dashboardPage()))
 app.get('/progress', (c) => c.html(dashboardPage()))
 
-// ─── ADMIN AUTH HELPER ───────────────────────────────────────────
-function isAdminAuthenticated(c: any): boolean {
-  const token = getCookie(c, SESSION_COOKIE)
-  return !!token && validateSessionToken(token)
+// ─── ADMIN AUTH HELPERS ──────────────────────────────────────────
+function makeAdminCookie(token: string): string {
+  return `${SESSION_COOKIE}=${token}; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=Lax`
 }
-
-function requireAdmin(c: any): Response | null {
-  if (!isAdminAuthenticated(c)) {
-    return c.redirect('/admin/login')
-  }
-  return null
+function clearAdminCookie(): string {
+  return `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`
 }
 
 // ─── ADMIN LOGIN ─────────────────────────────────────────────────
-app.get('/admin/login', (c) => {
-  // If already logged in, redirect to dashboard
-  if (isAdminAuthenticated(c)) return c.redirect('/admin')
+app.get('/admin/login', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (token && c.env.KICKLAB_KV) {
+    const valid = await validateAdminSession(c.env.KICKLAB_KV, token)
+    if (valid) return c.redirect('/admin')
+  }
   return c.html(adminLoginPage())
 })
 
 app.post('/admin/login', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.html(adminLoginPage('Server error — storage unavailable.'), 503)
+
   const body = await c.req.parseBody()
   const username = (body['username'] as string || '').trim()
   const password = (body['password'] as string || '').trim()
 
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    const token = createSessionToken(username)
-    setCookie(c, SESSION_COOKIE, token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'Lax',
-      maxAge: 60 * 60 * 24, // 24 hours
-      path: '/',
-    })
-    return c.redirect('/admin')
+    // Store session token in KV — reliable across all Cloudflare edge nodes
+    const token = await createAdminSession(kv)
+    // Return 200 with Set-Cookie header + JS redirect.
+    // Cloudflare Pages strips Set-Cookie on 302 responses, so we use 200 + JS.
+    return new Response(
+      `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<script>window.location.replace("/admin");</script>
+<noscript><meta http-equiv="refresh" content="0;url=/admin"></noscript>
+</head><body style="background:#080e1a;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
+<p style="font-size:14px">Signing in...</p></body></html>`,
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=UTF-8',
+          'Set-Cookie': makeAdminCookie(token),
+        },
+      }
+    )
   }
 
-  // Wrong credentials — re-render login page with error
-  return c.html(adminLoginPage('Invalid username or password. Please try again.'), 401)
+  return c.html(adminLoginPage('Invalid email or password. Please try again.'), 401)
 })
 
 // ─── ADMIN LOGOUT ────────────────────────────────────────────────
-app.get('/admin/logout', (c) => {
-  deleteCookie(c, SESSION_COOKIE, { path: '/' })
-  return c.redirect('/admin/login')
+app.get('/admin/logout', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  const token = getCookie(c, SESSION_COOKIE)
+  if (token && kv) await deleteAdminSession(kv, token)
+  return new Response('', {
+    status: 302,
+    headers: {
+      'Location': '/admin/login',
+      'Set-Cookie': clearAdminCookie(),
+    },
+  })
 })
 
 // ─── ADMIN PROTECTED ROUTES ──────────────────────────────────────
-app.get('/admin', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminDashboardPage())
 })
 
-app.get('/admin/users', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/users', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminUsersPage())
 })
 
-app.get('/admin/drills', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/drills', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminDrillsPage())
 })
 
-app.get('/admin/videos', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/videos', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminVideosPage())
 })
 
-app.get('/admin/products', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/products', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminProductsPage())
 })
 
-app.get('/admin/plans', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/plans', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminPlansPage())
 })
 
-app.get('/admin/settings', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/settings', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminSettingsPage())
 })
 
-app.get('/admin/payments', (c) => {
-  const redirect = requireAdmin(c)
-  if (redirect) return redirect
+app.get('/admin/payments', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
   return c.html(adminPaymentsPage())
 })
 

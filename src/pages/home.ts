@@ -380,6 +380,24 @@ function closeVideoModal() {
 }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeVideoModal(); });
 </script>
+
+<!-- CONTACT SECTION -->
+<section class="py-20 bg-surface border-t border-white/5">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="inline-flex items-center gap-2 bg-accent-600/10 border border-accent-600/20 rounded-full px-4 py-1.5 mb-6">
+      <i class="fas fa-envelope text-accent-400 text-xs"></i>
+      <span class="text-accent-400 text-sm font-medium">Get In Touch</span>
+    </div>
+    <h2 class="font-oswald text-4xl font-bold text-white mb-4">QUESTIONS OR COMMENTS?</h2>
+    <p class="text-gray-400 text-lg mb-8">We'd love to hear from you. Whether it's about training, plans, or anything else — reach out anytime.</p>
+    <a href="mailto:kicklabs.soccer@gmail.com"
+      class="inline-flex items-center gap-3 bg-accent-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-xl transition-all text-lg hover:shadow-xl hover:shadow-accent-600/30 hover:-translate-y-0.5">
+      <i class="fas fa-envelope"></i>
+      kicklabs.soccer@gmail.com
+    </a>
+    <p class="text-gray-600 text-sm mt-6">We typically respond within 24 hours.</p>
+  </div>
+</section>
 `
   });
 }

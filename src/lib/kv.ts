@@ -136,6 +136,23 @@ export async function deleteSession(kv: KVNamespace, token: string): Promise<voi
   await kv.delete(`session:${token}`);
 }
 
+// ── Admin sessions (stored in KV with admin: prefix) ──────────────
+export async function createAdminSession(kv: KVNamespace): Promise<string> {
+  const token = makeSessionToken();
+  await kv.put(`admin_session:${token}`, 'admin', { expirationTtl: 86400 });
+  return token;
+}
+
+export async function validateAdminSession(kv: KVNamespace, token: string): Promise<boolean> {
+  if (!token) return false;
+  const val = await kv.get(`admin_session:${token}`);
+  return val === 'admin';
+}
+
+export async function deleteAdminSession(kv: KVNamespace, token: string): Promise<void> {
+  await kv.delete(`admin_session:${token}`);
+}
+
 // ── Analytics helpers ─────────────────────────────────────────────
 export function computeStats(users: KickUser[], payments: KickPayment[]) {
   const total = users.length;

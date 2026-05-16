@@ -299,6 +299,12 @@ export function footer() {
           <li><a href="/auth/signup" class="text-gray-500 hover:text-white text-sm transition-colors">Create Account</a></li>
           <li><a href="#" class="text-gray-500 hover:text-white text-sm transition-colors">Privacy Policy</a></li>
           <li><a href="#" class="text-gray-500 hover:text-white text-sm transition-colors">Terms of Service</a></li>
+          <li>
+            <a href="mailto:kicklabs.soccer@gmail.com" class="flex items-center gap-2 text-gray-500 hover:text-accent-400 text-sm transition-colors group">
+              <i class="fas fa-envelope text-xs group-hover:text-accent-400"></i>
+              Contact Us
+            </a>
+          </li>
         </ul>
       </div>
     </div>
