@@ -459,10 +459,11 @@ app.put('/api/admin/users/:email', async (c) => {
   const user = await getUser(kv, email)
   if (!user) return c.json({ error: 'User not found' }, 404)
   const body = await c.req.json() as any
-  // Only allow safe fields to be updated
-  const { name, plan } = body
+  // Allow safe fields to be updated
+  const { name, plan, password } = body
   if (name) user.name = name.trim()
   if (plan && ['free','starter','pro','elite'].includes(plan)) user.plan = plan as KickUser['plan']
+  if (password && password.length >= 8) user.passwordHash = await hashPassword(password)
   await saveUser(kv, user)
   return c.json({ ok: true })
 })
@@ -495,6 +496,53 @@ app.post('/api/admin/users', async (c) => {
   await saveUser(kv, user)
   const { passwordHash: _, ...safeUser } = user
   return c.json({ ok: true, user: safeUser })
+})
+
+// GET /api/admin/users/:email — fetch a single user's full profile
+app.get('/api/admin/users/:email', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const email = decodeURIComponent(c.req.param('email')).toLowerCase()
+  const user = await getUser(kv, email)
+  if (!user) return c.json({ error: 'User not found' }, 404)
+  const { passwordHash: _, ...safe } = user
+  return c.json({ ok: true, user: safe })
+})
+
+// POST /api/admin/payment/manual — admin manually activates a plan (cash, in-person, etc.)
+app.post('/api/admin/payment/manual', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const { email, plan, method, amount, note, billing } = await c.req.json() as any
+  if (!email || !plan) return c.json({ error: 'Email and plan are required' }, 400)
+  const user = await getUser(kv, email)
+  if (!user) return c.json({ error: 'User not found' }, 404)
+  // Create a confirmed payment record for audit trail
+  const payment: KickPayment = {
+    id: crypto.randomUUID(),
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    plan,
+    amount: amount ? `$${amount}` : '$0',
+    method: method || 'card',
+    status: 'confirmed',
+    billing: billing || 'monthly',
+    createdAt: new Date().toISOString(),
+    confirmedAt: new Date().toISOString(),
+    note: note || 'Manual activation by admin',
+  }
+  await savePayment(kv, payment)
+  // Upgrade the user's plan immediately
+  user.plan = plan as KickUser['plan']
+  user.paymentStatus = 'confirmed'
+  user.paymentMethod = method || 'manual'
+  await saveUser(kv, user)
+  return c.json({ ok: true, payment, message: `Plan upgraded to ${plan}` })
 })
 
 // GET /api/admin/payments — all payments with status
