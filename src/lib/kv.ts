@@ -136,6 +136,90 @@ export async function deleteSession(kv: KVNamespace, token: string): Promise<voi
   await kv.delete(`session:${token}`);
 }
 
+// ── Content Management ────────────────────────────────────────────
+
+export type CMSProduct = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  amazonUrl: string;
+  category: string;
+  tier: string;
+  emoji: string;
+  featured: boolean;
+  createdAt: string;
+};
+
+export type CMSVideo = {
+  id: string;
+  title: string;
+  youtubeId: string;
+  topic: string;
+  level: string;
+  description: string;
+  featured: boolean;
+  createdAt: string;
+};
+
+export type CMSDrill = {
+  id: string;
+  title: string;
+  category: string;
+  level: string;
+  duration: string;
+  description: string;
+  instructions: string;
+  planRequired: 'free' | 'starter' | 'pro' | 'elite';
+  featured: boolean;
+  createdAt: string;
+};
+
+export type CMSAnnouncement = {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning';
+  active: boolean;
+  createdAt: string;
+};
+
+// Products
+export async function getCMSProducts(kv: KVNamespace): Promise<CMSProduct[]> {
+  const raw = await kv.get('cms:products');
+  return raw ? JSON.parse(raw) : [];
+}
+export async function saveCMSProducts(kv: KVNamespace, products: CMSProduct[]): Promise<void> {
+  await kv.put('cms:products', JSON.stringify(products));
+}
+
+// Videos
+export async function getCMSVideos(kv: KVNamespace): Promise<CMSVideo[]> {
+  const raw = await kv.get('cms:videos');
+  return raw ? JSON.parse(raw) : [];
+}
+export async function saveCMSVideos(kv: KVNamespace, videos: CMSVideo[]): Promise<void> {
+  await kv.put('cms:videos', JSON.stringify(videos));
+}
+
+// Drills
+export async function getCMSDrills(kv: KVNamespace): Promise<CMSDrill[]> {
+  const raw = await kv.get('cms:drills');
+  return raw ? JSON.parse(raw) : [];
+}
+export async function saveCMSDrills(kv: KVNamespace, drills: CMSDrill[]): Promise<void> {
+  await kv.put('cms:drills', JSON.stringify(drills));
+}
+
+// Announcements
+export async function getCMSAnnouncements(kv: KVNamespace): Promise<CMSAnnouncement[]> {
+  const raw = await kv.get('cms:announcements');
+  return raw ? JSON.parse(raw) : [];
+}
+export async function saveCMSAnnouncements(kv: KVNamespace, items: CMSAnnouncement[]): Promise<void> {
+  await kv.put('cms:announcements', JSON.stringify(items));
+}
+
 // ── Admin sessions (stored in KV with admin: prefix) ──────────────
 export async function createAdminSession(kv: KVNamespace): Promise<string> {
   const token = makeSessionToken();

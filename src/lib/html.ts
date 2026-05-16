@@ -385,7 +385,12 @@ export function pageShell(opts: { title: string; description?: string; activePat
 </head>
 <body class="bg-midnight text-white">
   ${nav(opts.activePath || '/')}
-  <main style="padding-top: 64px;">
+
+  <!-- Site Announcement Banner (loaded from CMS) -->
+  <div id="site-announcement-bar" style="display:none; padding-top:64px; position:relative; z-index:40;">
+  </div>
+
+  <main id="site-main" style="padding-top: 64px;">
     ${opts.body}
   </main>
   ${footer()}
@@ -408,6 +413,38 @@ export function pageShell(opts: { title: string; description?: string; activePat
       </button>
     </div>
   </div>
+
+  <!-- Site Announcement Banner Logic -->
+  <script>
+  (async function() {
+    try {
+      const res = await fetch('/api/announcement');
+      if (!res.ok) return;
+      const data = await res.json();
+      const ann = data.announcement;
+      if (!ann) return;
+      const bar = document.getElementById('site-announcement-bar');
+      const main = document.getElementById('site-main');
+      if (!bar) return;
+      // Color scheme per type
+      const schemes = {
+        info:    { bg: 'rgba(37,99,235,0.15)', border: 'rgba(37,99,235,0.35)', icon: 'fas fa-info-circle', iconColor: '#60a5fa', textColor: '#93c5fd' },
+        success: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)',  icon: 'fas fa-check-circle', iconColor: '#4ade80', textColor: '#86efac' },
+        warning: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)',  icon: 'fas fa-exclamation-triangle', iconColor: '#fbbf24', textColor: '#fde68a' },
+      };
+      const s = schemes[ann.type] || schemes.info;
+      bar.innerHTML = \`<div style="background:\${s.bg};border-bottom:1px solid \${s.border};padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+        <i class="\${s.icon}" style="color:\${s.iconColor};flex-shrink:0"></i>
+        \${ann.title ? \`<strong style="color:#fff;font-size:13px">\${ann.title}</strong>\` : ''}
+        \${ann.message ? \`<span style="color:\${s.textColor};font-size:13px">\${ann.message}</span>\` : ''}
+        <button onclick="this.closest('#site-announcement-bar').style.display='none';document.getElementById('site-main').style.paddingTop='64px'"
+          style="background:transparent;border:none;color:#9ca3af;cursor:pointer;padding:2px 6px;font-size:16px;margin-left:8px;line-height:1">&times;</button>
+      </div>\`;
+      bar.style.display = 'block';
+      if (main) main.style.paddingTop = '0';
+    } catch(e) {}
+  })();
+  </script>
 
   <!-- Service Worker + PWA Install Logic -->
   <script>

@@ -71,6 +71,16 @@ export function productsPage(query: { cat?: string; tier?: string }) {
       <p class="text-gray-600 text-xs flex items-center gap-1.5"><span class="text-[#FF9900]">a</span>Shop on Amazon — Trusted &amp; Secure</p>
     </div>
 
+    <!-- CMS Featured Products (loaded dynamically) -->
+    <div id="cms-products-section" class="hidden mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-1 h-5 bg-accent-500 rounded-full"></span>
+        <h2 class="text-white font-bold text-lg">New Arrivals</h2>
+        <span class="bg-accent-600/20 text-accent-400 text-xs font-bold px-2 py-0.5 rounded-full border border-accent-600/30">Just Added</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="cms-products-grid"></div>
+    </div>
+
     <!-- Products grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="products-grid">
       ${PRODUCTS.map(p => {
@@ -144,8 +154,45 @@ function applyProductFilters() {
   document.getElementById('product-count').textContent = visible;
 }
 
+// Load CMS products from API
+async function loadCMSProducts() {
+  try {
+    const res = await fetch('/api/cms/products');
+    if (!res.ok) return;
+    const data = await res.json();
+    const products = data.products || [];
+    if (!products.length) return;
+    const grid = document.getElementById('cms-products-grid');
+    const section = document.getElementById('cms-products-section');
+    grid.innerHTML = products.map(p => \`
+      <div class="bg-panel border border-accent-600/20 rounded-2xl overflow-hidden card-hover flex flex-col">
+        <div class="p-5 flex-1">
+          <div class="bg-accent-600/10 text-accent-400 text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mb-3">✨ New</div>
+          <div class="text-4xl mb-3">\${p.emoji || '📦'}</div>
+          <h3 class="text-white font-semibold text-sm mb-2 line-clamp-2">\${p.name}</h3>
+          <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-3">\${p.description || ''}</p>
+          <div class="flex flex-wrap gap-1 mb-3">
+            \${p.category ? '<span class="bg-white/5 text-gray-500 text-[10px] px-1.5 py-0.5 rounded border border-white/5">' + p.category + '</span>' : ''}
+            \${p.tier && p.tier !== 'All' ? '<span class="bg-white/5 text-gray-500 text-[10px] px-1.5 py-0.5 rounded border border-white/5">' + p.tier + '</span>' : ''}
+          </div>
+        </div>
+        <div class="px-5 pb-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[#FF9900] font-bold text-lg">\${p.price || 'View on Amazon'}</span>
+          </div>
+          <a href="\${p.amazonUrl}" target="_blank" rel="noopener noreferrer" class="amazon-btn flex items-center justify-center gap-2 text-black font-bold py-2.5 rounded-xl text-sm w-full transition-all">
+            <span style="font-weight:900;font-size:14px;">a</span> Buy on Amazon
+          </a>
+        </div>
+      </div>
+    \`).join('');
+    section.classList.remove('hidden');
+  } catch(e) {}
+}
+
 // Apply initial filters from URL
 document.addEventListener('DOMContentLoaded', () => {
+  loadCMSProducts();
   if (pActiveCat !== 'All' || pActiveTier !== 'All') {
     applyProductFilters();
     // Update active buttons

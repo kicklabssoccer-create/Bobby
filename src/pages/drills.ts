@@ -41,6 +41,16 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
       </div>
     </div>
 
+    <!-- CMS Featured Drills (loaded dynamically) -->
+    <div id="cms-drills-section" class="hidden mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-1 h-5 bg-accent-500 rounded-full"></span>
+        <h2 class="text-white font-bold text-lg">Featured Drills</h2>
+        <span class="bg-accent-600/20 text-accent-400 text-xs font-bold px-2 py-0.5 rounded-full border border-accent-600/30">New</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="cms-drills-grid"></div>
+    </div>
+
     <!-- Stats -->
     <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-6">
       <span id="drill-count" class="text-white font-semibold">${DRILLS.length} drills</span>
@@ -271,7 +281,56 @@ function closeUpgradeModal() {
 var PLAN_ORDER = ['free','starter','pro','elite'];
 
 // Unlock drills based on user plan from localStorage
+// Load CMS featured drills from API
+async function loadCMSDrills() {
+  try {
+    const res = await fetch('/api/cms/drills');
+    if (!res.ok) return;
+    const data = await res.json();
+    const drills = data.drills || [];
+    if (!drills.length) return;
+    const PLAN_LABEL = { free: '🆓 Free', starter: '🌱 Starter', pro: '⚡ Pro', elite: '🏆 Elite' };
+    const LEVEL_CLS  = { Beginner: 'badge-beginner', Intermediate: 'badge-intermediate', Advanced: 'badge-advanced' };
+    const grid = document.getElementById('cms-drills-grid');
+    const section = document.getElementById('cms-drills-section');
+    const userObj = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
+    const UP = ['free','starter','pro','elite'];
+    const uTier = UP.indexOf((userObj && userObj.plan) || 'free');
+    grid.innerHTML = drills.map(d => {
+      const canAccess = uTier >= UP.indexOf(d.planRequired || 'free');
+      const lvlCls = LEVEL_CLS[d.level] || 'badge-beginner';
+      return \`<div class="bg-panel border border-accent-600/20 rounded-2xl overflow-hidden card-hover cursor-pointer"
+           onclick="\${canAccess ? 'void(0)' : "window.location='/pricing'"}">
+        <div class="p-5">
+          <div class="flex items-start justify-between mb-3">
+            <span class="\${lvlCls} text-xs font-semibold px-2 py-0.5 rounded-full">\${d.level}</span>
+            <span class="bg-accent-600/15 text-accent-400 text-[10px] font-bold px-1.5 py-0.5 rounded">✨ New</span>
+          </div>
+          <h3 class="text-white font-semibold text-sm mb-1 line-clamp-2">\${d.title}</h3>
+          <p class="text-accent-400 text-xs font-medium mb-2">\${d.category}</p>
+          \${canAccess
+            ? \`<p class="text-gray-500 text-xs line-clamp-2 mb-3">\${d.description || ''}</p>\`
+            : \`<p class="text-gray-600 text-xs mb-3">Requires \${PLAN_LABEL[d.planRequired] || d.planRequired} plan.</p>\`
+          }
+          <div class="flex items-center gap-3 text-gray-600 text-xs">
+            <span class="flex items-center gap-1"><i class="fas fa-clock"></i> \${d.duration}</span>
+          </div>
+          \${d.instructions && canAccess ? \`
+          <div class="mt-3 pt-3 border-t border-white/5">
+            <details class="group">
+              <summary class="text-accent-400 text-xs font-semibold cursor-pointer">View Instructions</summary>
+              <pre class="text-gray-400 text-xs mt-2 whitespace-pre-wrap leading-relaxed">\${d.instructions}</pre>
+            </details>
+          </div>\` : ''}
+        </div>
+      </div>\`;
+    }).join('');
+    section.classList.remove('hidden');
+  } catch(e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadCMSDrills();
   const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
   const userPlan = (user && user.plan) ? user.plan : 'free';
   const userTier = PLAN_ORDER.indexOf(userPlan);

@@ -14,6 +14,7 @@ export function adminShell(opts: {
     { id: 'products',   href: '/admin/products',   icon: 'fas fa-shopping-cart',  label: 'Products'   },
     { id: 'payments',   href: '/admin/payments',   icon: 'fas fa-credit-card',    label: 'Payments'   },
     { id: 'plans',      href: '/admin/plans',      icon: 'fas fa-tag',            label: 'Plans'      },
+    { id: 'content',    href: '/admin/content',    icon: 'fas fa-edit',           label: 'Content'    },
     { id: 'settings',   href: '/admin/settings',   icon: 'fas fa-cog',            label: 'Settings'   },
   ]
 

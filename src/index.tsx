@@ -9,8 +9,13 @@ import {
   savePayment, getPayment, getAllPayments,
   createSession, getSessionEmail, deleteSession,
   createAdminSession, validateAdminSession, deleteAdminSession,
+  getCMSProducts, saveCMSProducts,
+  getCMSVideos, saveCMSVideos,
+  getCMSDrills, saveCMSDrills,
+  getCMSAnnouncements, saveCMSAnnouncements,
   computeStats,
   type KickUser, type KickPayment,
+  type CMSProduct, type CMSVideo, type CMSDrill, type CMSAnnouncement,
 } from './lib/kv'
 
 type Bindings = {
@@ -45,6 +50,7 @@ import { adminProductsPage } from './admin/pages/products'
 import { adminPlansPage } from './admin/pages/plans'
 import { adminSettingsPage } from './admin/pages/settings'
 import { adminPaymentsPage } from './admin/pages/payments'
+import { adminContentPage } from './admin/pages/content'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -625,6 +631,230 @@ app.post('/api/admin/mailchimp/campaign', async (c) => {
   }
 })
 
+// ─── CMS API ROUTES ──────────────────────────────────────────────
+
+// Public: get active announcement
+app.get('/api/announcement', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ announcement: null })
+  const items = await getCMSAnnouncements(kv)
+  const active = items.find(a => a.active) || null
+  return c.json({ announcement: active })
+})
+
+// Public: get CMS products (merged with defaults on frontend)
+app.get('/api/cms/products', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ products: [] })
+  const products = await getCMSProducts(kv)
+  return c.json({ products })
+})
+
+// Public: get CMS videos
+app.get('/api/cms/videos', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ videos: [] })
+  const videos = await getCMSVideos(kv)
+  return c.json({ videos })
+})
+
+// Public: get CMS drills
+app.get('/api/cms/drills', async (c) => {
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ drills: [] })
+  const drills = await getCMSDrills(kv)
+  return c.json({ drills })
+})
+
+// Admin: Products CRUD
+app.get('/api/admin/cms/products', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  return c.json({ products: await getCMSProducts(kv) })
+})
+app.post('/api/admin/cms/products', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const body = await c.req.json() as any
+  const products = await getCMSProducts(kv)
+  const product: CMSProduct = {
+    id: crypto.randomUUID(),
+    name: body.name || 'New Product',
+    description: body.description || '',
+    price: body.price || '',
+    amazonUrl: body.amazonUrl || '',
+    category: body.category || 'General',
+    tier: body.tier || 'Starter',
+    emoji: body.emoji || '⚽',
+    featured: body.featured || false,
+    createdAt: new Date().toISOString(),
+  }
+  products.unshift(product)
+  await saveCMSProducts(kv, products)
+  return c.json({ ok: true, product })
+})
+app.put('/api/admin/cms/products/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const body = await c.req.json() as any
+  const products = await getCMSProducts(kv)
+  const idx = products.findIndex(p => p.id === id)
+  if (idx === -1) return c.json({ error: 'Not found' }, 404)
+  products[idx] = { ...products[idx], ...body, id }
+  await saveCMSProducts(kv, products)
+  return c.json({ ok: true })
+})
+app.delete('/api/admin/cms/products/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const products = (await getCMSProducts(kv)).filter(p => p.id !== id)
+  await saveCMSProducts(kv, products)
+  return c.json({ ok: true })
+})
+
+// Admin: Videos CRUD
+app.get('/api/admin/cms/videos', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  return c.json({ videos: await getCMSVideos(kv) })
+})
+app.post('/api/admin/cms/videos', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const body = await c.req.json() as any
+  const videos = await getCMSVideos(kv)
+  const video: CMSVideo = {
+    id: crypto.randomUUID(),
+    title: body.title || 'New Video',
+    youtubeId: body.youtubeId || '',
+    topic: body.topic || 'General',
+    level: body.level || 'Beginner',
+    description: body.description || '',
+    featured: body.featured || false,
+    createdAt: new Date().toISOString(),
+  }
+  videos.unshift(video)
+  await saveCMSVideos(kv, videos)
+  return c.json({ ok: true, video })
+})
+app.put('/api/admin/cms/videos/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const body = await c.req.json() as any
+  const videos = await getCMSVideos(kv)
+  const idx = videos.findIndex(v => v.id === id)
+  if (idx === -1) return c.json({ error: 'Not found' }, 404)
+  videos[idx] = { ...videos[idx], ...body, id }
+  await saveCMSVideos(kv, videos)
+  return c.json({ ok: true })
+})
+app.delete('/api/admin/cms/videos/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const videos = (await getCMSVideos(kv)).filter(v => v.id !== id)
+  await saveCMSVideos(kv, videos)
+  return c.json({ ok: true })
+})
+
+// Admin: Drills CRUD
+app.get('/api/admin/cms/drills', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  return c.json({ drills: await getCMSDrills(kv) })
+})
+app.post('/api/admin/cms/drills', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const body = await c.req.json() as any
+  const drills = await getCMSDrills(kv)
+  const drill: CMSDrill = {
+    id: crypto.randomUUID(),
+    title: body.title || 'New Drill',
+    category: body.category || 'Dribbling',
+    level: body.level || 'Beginner',
+    duration: body.duration || '15 min',
+    description: body.description || '',
+    instructions: body.instructions || '',
+    planRequired: body.planRequired || 'free',
+    featured: body.featured || false,
+    createdAt: new Date().toISOString(),
+  }
+  drills.unshift(drill)
+  await saveCMSDrills(kv, drills)
+  return c.json({ ok: true, drill })
+})
+app.put('/api/admin/cms/drills/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const body = await c.req.json() as any
+  const drills = await getCMSDrills(kv)
+  const idx = drills.findIndex(d => d.id === id)
+  if (idx === -1) return c.json({ error: 'Not found' }, 404)
+  drills[idx] = { ...drills[idx], ...body, id }
+  await saveCMSDrills(kv, drills)
+  return c.json({ ok: true })
+})
+app.delete('/api/admin/cms/drills/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const drills = (await getCMSDrills(kv)).filter(d => d.id !== id)
+  await saveCMSDrills(kv, drills)
+  return c.json({ ok: true })
+})
+
+// Admin: Announcements CRUD
+app.get('/api/admin/cms/announcements', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  return c.json({ announcements: await getCMSAnnouncements(kv) })
+})
+app.post('/api/admin/cms/announcements', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const body = await c.req.json() as any
+  const items = await getCMSAnnouncements(kv)
+  // Only one can be active at a time
+  if (body.active) items.forEach(a => a.active = false)
+  const item: CMSAnnouncement = {
+    id: crypto.randomUUID(),
+    title: body.title || '',
+    message: body.message || '',
+    type: body.type || 'info',
+    active: body.active || false,
+    createdAt: new Date().toISOString(),
+  }
+  items.unshift(item)
+  await saveCMSAnnouncements(kv, items)
+  return c.json({ ok: true, item })
+})
+app.put('/api/admin/cms/announcements/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const body = await c.req.json() as any
+  const items = await getCMSAnnouncements(kv)
+  if (body.active) items.forEach(a => a.active = false)
+  const idx = items.findIndex(a => a.id === id)
+  if (idx === -1) return c.json({ error: 'Not found' }, 404)
+  items[idx] = { ...items[idx], ...body, id }
+  await saveCMSAnnouncements(kv, items)
+  return c.json({ ok: true })
+})
+app.delete('/api/admin/cms/announcements/:id', async (c) => {
+  const authErr = await requireAdminAPI(c); if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV; if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const id = c.req.param('id')
+  const items = (await getCMSAnnouncements(kv)).filter(a => a.id !== id)
+  await saveCMSAnnouncements(kv, items)
+  return c.json({ ok: true })
+})
+
 // ─── PUBLIC ROUTES ───────────────────────────────────────────────
 app.get('/', (c) => c.html(homePage()))
 app.get('/programs', (c) => c.html(programsPage()))
@@ -769,6 +999,13 @@ app.get('/admin/payments', async (c) => {
   if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
     return c.redirect('/admin/login')
   return c.html(adminPaymentsPage())
+})
+
+app.get('/admin/content', async (c) => {
+  const token = getCookie(c, SESSION_COOKIE)
+  if (!token || !c.env.KICKLAB_KV || !(await validateAdminSession(c.env.KICKLAB_KV, token)))
+    return c.redirect('/admin/login')
+  return c.html(adminContentPage())
 })
 
 // ─── 404 ─────────────────────────────────────────────────────────

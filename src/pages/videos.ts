@@ -461,6 +461,16 @@ export function videosPage() {
       </div>`).join('')}
   </div>
 
+  <!-- CMS Featured Videos (loaded dynamically) -->
+  <div id="cms-videos-section" class="hidden mb-10">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="w-1 h-5 bg-accent-500 rounded-full"></span>
+      <h2 class="text-white font-bold text-lg">Featured This Week</h2>
+      <span class="bg-accent-600/20 text-accent-400 text-xs font-bold px-2 py-0.5 rounded-full border border-accent-600/30">New</span>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="cms-videos-grid"></div>
+  </div>
+
   <!-- Filters -->
   <div class="bg-panel border border-white/10 rounded-2xl p-4 mb-8">
     <div class="flex flex-wrap gap-3 items-center">
@@ -621,7 +631,44 @@ let userPlan   = 'free';
 let curTopicId = null;
 let curVidIdx  = 0;
 
+// Load CMS featured videos from API
+async function loadCMSVideos() {
+  try {
+    const res = await fetch('/api/cms/videos');
+    if (!res.ok) return;
+    const data = await res.json();
+    const vids = (data.videos || []).filter(v => v.featured !== false);
+    if (!vids.length) return;
+    const grid = document.getElementById('cms-videos-grid');
+    const section = document.getElementById('cms-videos-section');
+    grid.innerHTML = vids.map(v => {
+      const thumb = 'https://img.youtube.com/vi/' + v.youtubeId + '/mqdefault.jpg';
+      return \`<div class="bg-panel border border-accent-600/20 rounded-2xl overflow-hidden card-hover cursor-pointer"
+           onclick="window.open('https://youtube.com/watch?v=\${v.youtubeId}','_blank')">
+        <div class="relative">
+          <img src="\${thumb}" onerror="this.src=''" alt="\${v.title}" class="w-full h-36 object-cover">
+          <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+              <i class="fab fa-youtube text-white text-lg"></i>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-1.5 mb-1.5 flex-wrap">
+            <span class="bg-accent-600/15 text-accent-400 text-[10px] font-bold px-2 py-0.5 rounded-full">✨ Featured</span>
+            <span class="text-gray-600 text-[10px]">\${v.level || ''}</span>
+          </div>
+          <h3 class="text-white font-semibold text-sm line-clamp-2 mb-1">\${v.title}</h3>
+          <p class="text-gray-500 text-xs line-clamp-2">\${v.description || v.topic || ''}</p>
+        </div>
+      </div>\`;
+    }).join('');
+    section.classList.remove('hidden');
+  } catch(e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadCMSVideos();
   try {
     const u = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
     userPlan = (u && u.plan) ? u.plan : 'free';
