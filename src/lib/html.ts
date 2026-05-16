@@ -275,7 +275,7 @@ export function footer() {
     <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
       <div class="md:col-span-2">
         <div class="mb-4">${logo('md')}</div>
-        <p class="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">Elite soccer training for all levels. Start free, upgrade when you're ready. Follow us on Instagram for free daily tips!</p>
+        <p class="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">Elite soccer training for all levels at kicklabssoccer.com. Start free, upgrade when you're ready. Follow us on Instagram for free daily tips!</p>
         <div class="flex gap-3">
           <a href="https://instagram.com/kick.lab.soccer" target="_blank" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-pink-400 hover:bg-pink-400/10 transition-all"><i class="fab fa-instagram"></i></a>
           <a href="#" class="w-9 h-9 bg-panel rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all"><i class="fab fa-twitter"></i></a>
@@ -309,7 +309,7 @@ export function footer() {
       </div>
     </div>
     <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <p class="text-gray-600 text-sm">© 2026 Kicklab. All rights reserved.</p>
+      <p class="text-gray-600 text-sm">© 2026 Kicklabs Soccer · <a href="https://www.kicklabssoccer.com" class="hover:text-gray-400 transition-colors">kicklabssoccer.com</a></p>
       <p class="text-gray-700 text-xs">Amazon affiliate links. Prices may vary. We may earn a commission.</p>
     </div>
   </div>
@@ -317,7 +317,7 @@ export function footer() {
 }
 
 export function pageShell(opts: { title: string; description?: string; activePath?: string; body: string; extraHead?: string }) {
-  const desc = opts.description || 'Kicklab — elite soccer training programs, professional drills, and video tutorials for all skill levels.';
+  const desc = opts.description || 'Kicklabs Soccer — elite soccer training programs, professional drills, and video tutorials for all skill levels at kicklabssoccer.com.';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -331,8 +331,8 @@ export function pageShell(opts: { title: string; description?: string; activePat
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="Kicklab"/>
-  <meta name="application-name" content="Kicklab"/>
+  <meta name="apple-mobile-web-app-title" content="Kicklabs Soccer"/>
+  <meta name="application-name" content="Kicklabs Soccer"/>
   <meta name="msapplication-TileColor" content="#2563eb"/>
   <meta name="msapplication-TileImage" content="/static/icons/icon-144.png"/>
 
@@ -350,17 +350,23 @@ export function pageShell(opts: { title: string; description?: string; activePat
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon-96.png"/>
   <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/icon-72.png"/>
 
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://www.kicklabssoccer.com${opts.activePath || '/'}"/>
+
   <!-- Open Graph (social sharing) -->
   <meta property="og:title" content="${opts.title}"/>
   <meta property="og:description" content="${desc}"/>
   <meta property="og:type" content="website"/>
-  <meta property="og:image" content="/static/icons/icon-512.png"/>
+  <meta property="og:url" content="https://www.kicklabssoccer.com${opts.activePath || '/'}"/>
+  <meta property="og:site_name" content="Kicklabs Soccer"/>
+  <meta property="og:image" content="https://www.kicklabssoccer.com/static/icons/icon-512.png"/>
 
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:site" content="@kicklabssoccer"/>
   <meta name="twitter:title" content="${opts.title}"/>
   <meta name="twitter:description" content="${desc}"/>
-  <meta name="twitter:image" content="/static/icons/icon-512.png"/>
+  <meta name="twitter:image" content="https://www.kicklabssoccer.com/static/icons/icon-512.png"/>
 
   ${GLOBAL_STYLES}
   ${opts.extraHead || ''}
@@ -396,12 +402,12 @@ export function pageShell(opts: { title: string; description?: string; activePat
   ${footer()}
 
   <!-- PWA Install Banner (shows on mobile after 3s if not installed) -->
-  <div id="pwa-install-banner" role="banner" aria-label="Install Kicklab app">
+  <div id="pwa-install-banner" role="banner" aria-label="Install Kicklabs Soccer app">
     <div class="w-10 h-10 bg-accent-600 rounded-xl flex items-center justify-center flex-shrink-0">
       <span class="text-xl">⚽</span>
     </div>
     <div class="flex-1 min-w-0">
-      <p class="text-white text-sm font-bold leading-tight">Install Kicklab App</p>
+      <p class="text-white text-sm font-bold leading-tight">Install Kicklabs Soccer</p>
       <p class="text-gray-400 text-xs mt-0.5">Train anywhere — works offline too</p>
     </div>
     <div class="flex items-center gap-2 flex-shrink-0">

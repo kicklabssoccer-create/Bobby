@@ -2,7 +2,7 @@ import { pageShell } from '../lib/html';
 
 export function loginPage() {
   return pageShell({
-    title: 'Sign In — Kicklab',
+    title: 'Sign In — Kicklabs Soccer',
     activePath: '/auth/login',
     body: `
 <section class="min-h-[calc(100vh-64px)] flex items-center justify-center py-16 bg-midnight relative">
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 export function signupPage() {
   return pageShell({
-    title: 'Create Account — Kicklab',
+    title: 'Create Account — Kicklabs Soccer',
     activePath: '/auth/signup',
     body: `
 <section class="min-h-[calc(100vh-64px)] flex items-center justify-center py-16 bg-midnight relative">

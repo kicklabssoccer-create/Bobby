@@ -37,7 +37,7 @@ export function adminShell(opts: {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>${opts.title} — Kicklab Admin</title>
+  <title>${opts.title} — Kicklabs Soccer Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -157,7 +157,7 @@ export function adminShell(opts: {
         </button>
         <div>
           <h1 class="text-white font-bold text-base leading-none">${opts.title}</h1>
-          <p class="text-slate-500 text-xs mt-0.5">Kicklab Admin Panel</p>
+          <p class="text-slate-500 text-xs mt-0.5">Kicklabs Soccer Admin</p>
         </div>
       </div>
       <div class="flex items-center gap-3">

@@ -2,7 +2,7 @@ import { pageShell } from '../lib/html';
 
 export function pricingPage() {
   return pageShell({
-    title: 'Pricing — Kicklab',
+    title: 'Pricing — Kicklabs Soccer',
     activePath: '/pricing',
     body: `
 <section class="py-24">

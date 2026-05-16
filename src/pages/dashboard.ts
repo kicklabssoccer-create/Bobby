@@ -2,7 +2,7 @@ import { pageShell } from '../lib/html';
 
 export function dashboardPage() {
   return pageShell({
-    title: 'Dashboard — Kicklab',
+    title: 'Dashboard — Kicklabs Soccer',
     activePath: '/dashboard',
     body: `
 <section class="py-16 bg-midnight min-h-screen">

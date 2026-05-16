@@ -3,7 +3,7 @@ import { DRILLS, DRILL_CATEGORIES, DRILL_LEVELS } from '../data/drills';
 
 export function drillsPage(query: { level?: string; cat?: string; drill?: string }) {
   return pageShell({
-    title: 'Drills Library — Kicklab',
+    title: 'Drills Library — Kicklabs Soccer',
     activePath: '/drills',
     body: `
 <section class="py-16 bg-midnight min-h-screen">

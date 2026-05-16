@@ -60,8 +60,8 @@ app.use('/favicon.svg', serveStatic({ root: './', path: '/public/favicon.svg' })
 app.use('/manifest.json', serveStatic({ root: './', path: '/public/manifest.json' }))
 // Serve service worker with correct MIME type (must be at root scope)
 app.get('/sw.js', (c) => {
-  const swContent = `// Kicklab Service Worker — PWA offline support
-const CACHE_NAME = 'kicklab-v2';
+  const swContent = `// Kicklabs Soccer Service Worker — PWA offline support
+const CACHE_NAME = 'kicklabs-soccer-v1';
 const PRECACHE_URLS = ['/','/drills','/videos','/programs','/pricing','/products','/dashboard'];
 
 self.addEventListener('install', (event) => {
@@ -600,7 +600,7 @@ app.post('/api/admin/mailchimp/campaign', async (c) => {
       settings: {
         subject_line: subject,
         preview_text: previewText || '',
-        from_name: 'Kicklab',
+        from_name: 'Kicklabs Soccer',
         reply_to: 'kicklabs.soccer@gmail.com',
       },
     })
@@ -612,12 +612,13 @@ app.post('/api/admin/mailchimp/campaign', async (c) => {
       html: `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#080e1a;color:#fff;padding:32px">
         <div style="text-align:center;margin-bottom:32px">
           <div style="background:#2563eb;width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:24px">⚽</div>
-          <h1 style="color:#fff;font-size:28px;margin:12px 0 4px">KICKLAB</h1>
+          <h1 style="color:#fff;font-size:28px;margin:12px 0 4px">KICKLABS SOCCER</h1>
+          <p style="color:#60a5fa;font-size:13px;margin:0">kicklabssoccer.com</p>
         </div>
         ${body}
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:32px 0"/>
         <p style="color:#6b7280;font-size:12px;text-align:center">
-          © 2026 Kicklab · <a href="*|UNSUB|*" style="color:#6b7280">Unsubscribe</a>
+          © 2026 Kicklabs Soccer &middot; <a href="https://www.kicklabssoccer.com" style="color:#6b7280">kicklabssoccer.com</a> &middot; <a href="*|UNSUB|*" style="color:#6b7280">Unsubscribe</a>
         </p>
       </body></html>`,
     })

@@ -14,5 +14,11 @@
   ],
   "vars": {
     "MAILCHIMP_SERVER": "us16"
-  }
+  },
+  // Custom domain — connect kicklabssoccer.com in Cloudflare Pages dashboard:
+  // Pages → kicklab project → Custom domains → Add → kicklabssoccer.com & www.kicklabssoccer.com
+  "routes": [
+    { "pattern": "kicklabssoccer.com/*", "zone_name": "kicklabssoccer.com" },
+    { "pattern": "www.kicklabssoccer.com/*", "zone_name": "kicklabssoccer.com" }
+  ]
 }

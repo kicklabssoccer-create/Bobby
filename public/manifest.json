@@ -1,8 +1,9 @@
 {
-  "name": "Kicklab Soccer Training",
-  "short_name": "Kicklab",
-  "description": "Elite soccer training programs, drills, and video tutorials for all skill levels.",
-  "start_url": "/",
+  "id": "https://www.kicklabssoccer.com/",
+  "name": "Kicklabs Soccer Training",
+  "short_name": "Kicklabs",
+  "description": "Elite soccer training programs, professional drills, and video tutorials for all skill levels. Train smarter at kicklabssoccer.com",
+  "start_url": "https://www.kicklabssoccer.com/",
   "display": "standalone",
   "background_color": "#080e1a",
   "theme_color": "#2563eb",
@@ -89,7 +90,9 @@
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Kicklab Mobile Training"
+      "label": "Kicklabs Soccer — Mobile Training"
     }
-  ]
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

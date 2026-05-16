@@ -434,7 +434,7 @@ export function videosPage() {
   }));
 
   return pageShell({
-    title: 'Video Library — Kicklab',
+    title: 'Video Library — Kicklabs Soccer',
     activePath: '/videos',
     body: `
 <section class="py-16 bg-midnight min-h-screen">

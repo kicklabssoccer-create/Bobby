@@ -2,7 +2,7 @@ import { pageShell } from '../lib/html';
 
 export function homePage() {
   return pageShell({
-    title: 'Kicklab — Train Like a Pro',
+    title: 'Kicklabs Soccer — Train Like a Pro',
     activePath: '/',
     body: `
 <!-- HERO SECTION -->
@@ -251,7 +251,7 @@ export function homePage() {
           <span class="bg-[#FF9900]/10 text-[#FF9900] border border-[#FF9900]/20 text-xs font-bold px-2 py-0.5 rounded">Available on Amazon</span>
         </div>
         <h2 class="font-oswald text-4xl font-bold text-white">TRAINING GEAR STORE</h2>
-        <p class="text-gray-400 mt-2">Equipment used across all Kicklab programs — buy directly on Amazon</p>
+        <p class="text-gray-400 mt-2">Equipment used across all Kicklabs Soccer programs — buy directly on Amazon</p>
       </div>
       <a href="/products" class="flex-shrink-0 bg-[#FF9900] hover:bg-[#FFB347] text-black font-bold px-6 py-3 rounded-xl transition-all flex items-center gap-2">
         <i class="fas fa-shopping-cart"></i> Shop All Gear

@@ -2,7 +2,7 @@ import { pageShell } from '../lib/html';
 
 export function programsPage() {
   return pageShell({
-    title: 'Training Programs — Kicklab',
+    title: 'Training Programs — Kicklabs Soccer',
     activePath: '/programs',
     body: `
 <section class="py-16 bg-midnight min-h-screen">

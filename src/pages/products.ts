@@ -3,7 +3,7 @@ import { PRODUCTS, PRODUCT_CATEGORIES, PRODUCT_TIERS } from '../data/products';
 
 export function productsPage(query: { cat?: string; tier?: string }) {
   return pageShell({
-    title: 'Training Gear Store — Kicklab',
+    title: 'Training Gear Store — Kicklabs Soccer',
     activePath: '/products',
     body: `
 <section class="py-16 bg-midnight min-h-screen">
