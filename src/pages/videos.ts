@@ -429,6 +429,7 @@ export function videosPage() {
   const allCards = TOPICS.map(t => topicCard(t)).join('');
   const topicsJS = TOPICS.map(t => ({
     id: t.id, label: t.label, plan: t.plan, desc: t.desc, category: t.category, level: t.level,
+    query: t.query,
     videos: t.videos,
   }));
 
@@ -554,13 +555,19 @@ export function videosPage() {
     </div>
 
     <!-- Player -->
-    <div style="background:#000;flex-shrink:0">
+    <div style="background:#000;flex-shrink:0;position:relative">
       <div style="position:relative;padding-bottom:56.25%;height:0">
+        <!-- Loading overlay -->
+        <div id="vid-loading" style="position:absolute;inset:0;z-index:10;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+          <div style="width:44px;height:44px;border:3px solid #2563eb;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+          <p style="color:#6b7280;font-size:13px">Finding the top video for this topic...</p>
+        </div>
         <iframe id="vid-frame"
                 src="" title="Soccer Training Video"
                 style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
+                allowfullscreen
+                onload="if(this.src)document.getElementById('vid-loading').style.display='none'">
         </iframe>
       </div>
     </div>
@@ -603,6 +610,7 @@ export function videosPage() {
 .badge-beginner    { background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3); }
 .badge-intermediate{ background:rgba(156,163,175,0.15);color:#d1d5db;border:1px solid rgba(156,163,175,0.3); }
 .badge-advanced    { background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25); }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <script>
@@ -688,28 +696,70 @@ function clearFilters() {
 }
 
 // ─── VIDEO MODAL ──────────────────────────────────────────────
+// Cache fetched top-video IDs so we don't refetch on re-open
+var _vidCache = {};
+
 function openTopic(id) {
   const t = TD.find(x => x.id === id);
   if (!t) return;
   curTopicId = id; curVidIdx = 0;
-  loadVid(t, 0);
+
+  // Show modal with loading state immediately
   document.getElementById('vid-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  document.getElementById('vid-title').textContent = t.label;
+  document.getElementById('vid-sub').textContent   = 'Loading top video...';
+  document.getElementById('vid-frame').src = '';
+  document.getElementById('vid-playlist').innerHTML = '';
+  document.getElementById('vid-loading').style.display = 'flex';
+
+  // If cached, use immediately
+  if (_vidCache[id]) {
+    renderTopVideo(t, _vidCache[id]);
+    return;
+  }
+
+  // Fetch top video from our server API
+  fetch('/api/youtube-top?q=' + encodeURIComponent(t.query))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.videoId) {
+        _vidCache[id] = data;
+        renderTopVideo(t, data);
+      } else {
+        // Fallback: use first hardcoded video in playlist
+        document.getElementById('vid-loading').style.display = 'none';
+        document.getElementById('vid-sub').textContent = 'Video 1 of ' + t.videos.length;
+        var v = t.videos[0];
+        embedVideo(v.id, 'https://www.youtube.com/watch?v=' + v.id, t, 0);
+      }
+    })
+    .catch(function() {
+      document.getElementById('vid-loading').style.display = 'none';
+      var v = t.videos[0];
+      embedVideo(v.id, 'https://www.youtube.com/watch?v=' + v.id, t, 0);
+    });
 }
 
-function loadVid(topic, idx) {
-  const v = topic.videos[idx];
-  curVidIdx = idx;
-  document.getElementById('vid-title').textContent = topic.label;
-  document.getElementById('vid-sub').textContent   = 'Video ' + (idx+1) + ' of ' + topic.videos.length + ' \u2014 ' + v.title;
-  document.getElementById('vid-yt-link').href      = 'https://www.youtube.com/watch?v=' + v.id;
-  document.getElementById('vid-frame').src         = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&rel=0&modestbranding=1';
+function renderTopVideo(topic, data) {
+  document.getElementById('vid-loading').style.display = 'none';
+  document.getElementById('vid-sub').textContent =
+    '\u2B50 Most Popular \u2014 ' + data.title + (data.channel ? ' \u00B7 ' + data.channel : '') + (data.views ? ' \u00B7 ' + data.views : '');
+  embedVideo(data.videoId, 'https://www.youtube.com/watch?v=' + data.videoId, topic, -1);
+}
 
-  // Playlist row — build via DOM to avoid any quote-escaping issues
+function embedVideo(videoId, ytUrl, topic, activeIdx) {
+  document.getElementById('vid-yt-link').href = ytUrl;
+  document.getElementById('vid-frame').src    =
+    'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1';
+  buildPlaylist(topic, activeIdx);
+}
+
+function buildPlaylist(topic, activeIdx) {
   const row = document.getElementById('vid-playlist');
   row.innerHTML = '';
   topic.videos.forEach(function(vv, i) {
-    const active = i === idx;
+    const active = i === activeIdx;
     const wrap = document.createElement('div');
     wrap.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid ' + (active?'#2563eb':'rgba(255,255,255,0.08)') + ';transition:border-color .2s';
     wrap.onclick = function() { switchVid(i); };
@@ -721,7 +771,10 @@ function loadVid(topic, idx) {
     img.src   = 'https://img.youtube.com/vi/' + vv.id + '/mqdefault.jpg';
     img.alt   = vv.title;
     img.style.cssText = 'width:140px;height:79px;object-fit:cover;display:block';
-    img.onerror = function() { this.src = 'https://img.youtube.com/vi/' + vv.id + '/default.jpg'; };
+    img.onerror = function() {
+      this.parentElement.style.background = '#1a2235';
+      this.style.display = 'none';
+    };
     imgWrap.appendChild(img);
 
     if (active) {
@@ -743,7 +796,11 @@ function loadVid(topic, idx) {
 
 function switchVid(idx) {
   const t = TD.find(x => x.id === curTopicId);
-  if (t) loadVid(t, idx);
+  if (!t) return;
+  curVidIdx = idx;
+  const v = t.videos[idx];
+  document.getElementById('vid-sub').textContent = 'Video ' + (idx+1) + ' of ' + t.videos.length + ' \u2014 ' + v.title;
+  embedVideo(v.id, 'https://www.youtube.com/watch?v=' + v.id, t, idx);
 }
 
 function closeVid() {

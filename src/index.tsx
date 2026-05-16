@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/cloudflare-workers'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { VIDEO_MAP, queryKey } from './data/videoMap'
 
 // Public pages
 import { homePage } from './pages/home'
@@ -35,6 +36,54 @@ const app = new Hono()
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/favicon.svg', serveStatic({ root: './', path: '/public/favicon.svg' }))
 app.use('/manifest.json', serveStatic({ root: './', path: '/public/manifest.json' }))
+
+// ─── YOUTUBE TOP VIDEO API ───────────────────────────────────────
+// Returns the highest-view YouTube video ID for a given search query.
+// First checks our curated VIDEO_MAP (no API key needed).
+// If not found, falls back to YouTube Data API v3 (requires YOUTUBE_API_KEY secret).
+app.get('/api/youtube-top', async (c) => {
+  const q = (c.req.query('q') || '').trim()
+  if (!q) return c.json({ error: 'Missing query' }, 400)
+
+  const key = queryKey(q)
+
+  // 1. Check curated map first (instant, no API call)
+  if (VIDEO_MAP[key]) {
+    const v = VIDEO_MAP[key]
+    return c.json({
+      videoId: v.id,
+      title: v.title,
+      channel: v.channel,
+      views: v.views,
+      source: 'curated',
+    })
+  }
+
+  // 2. Try YouTube Data API v3 if key is configured
+  const ytKey = (c.env as any)?.YOUTUBE_API_KEY
+  if (ytKey) {
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&order=viewCount&maxResults=1&key=${ytKey}`
+      const res = await fetch(url)
+      const data: any = await res.json()
+      if (data?.items?.[0]) {
+        const item = data.items[0]
+        return c.json({
+          videoId: item.id.videoId,
+          title: item.snippet.title,
+          channel: item.snippet.channelTitle,
+          views: '',
+          source: 'youtube-api',
+        })
+      }
+    } catch (e) {
+      console.error('YouTube API error:', e)
+    }
+  }
+
+  // 3. No match found
+  return c.json({ error: 'No video found', key }, 404)
+})
 
 // ─── PUBLIC ROUTES ───────────────────────────────────────────────
 app.get('/', (c) => c.html(homePage()))

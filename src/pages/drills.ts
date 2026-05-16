@@ -122,16 +122,18 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
           <div class="relative rounded-xl overflow-hidden bg-black" style="aspect-ratio:16/9">
             <div id="drill-video-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 z-10">
               <div class="w-8 h-8 border-2 border-accent-600 border-t-transparent rounded-full animate-spin mb-2"></div>
-              <p class="text-gray-400 text-xs">Loading videos...</p>
+              <p class="text-gray-400 text-xs">Finding top video...</p>
             </div>
             <iframe id="drill-video-iframe"
               width="100%" height="100%"
               frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
               style="position:absolute;top:0;left:0;width:100%;height:100%"
-              onload="document.getElementById('drill-video-loading').style.display='none'">
+              onload="if(this.src)document.getElementById('drill-video-loading').style.display='none'">
             </iframe>
           </div>
-          <p class="text-gray-600 text-xs mt-2 flex items-center gap-1"><i class="fab fa-youtube text-red-500"></i> Live YouTube results — click any video to watch it</p>
+          <p id="drill-video-meta" class="text-gray-500 text-xs mt-2 truncate"></p>
         </div>
         <!-- Steps -->
         <div class="mb-5">
@@ -206,12 +208,31 @@ function openDrill(id) {
   document.getElementById('modal-drill-players').textContent = drill.players;
   document.getElementById('modal-drill-equipment').textContent = drill.equipment;
   
-  // Load YouTube search for this specific drill
+  // Load top YouTube video for this drill via server API
   var ytQuery = drill.title + ' soccer drill tutorial ' + drill.level;
-  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ytQuery);
-  document.getElementById('drill-video-iframe').src = ytUrl;
-  document.getElementById('modal-drill-yt-link').href = ytUrl;
   document.getElementById('drill-video-loading').style.display = 'flex';
+  document.getElementById('drill-video-iframe').src = '';
+  document.getElementById('modal-drill-yt-link').href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ytQuery);
+  document.getElementById('drill-video-meta').textContent = '';
+  fetch('/api/youtube-top?q=' + encodeURIComponent(ytQuery))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.videoId) {
+        document.getElementById('drill-video-iframe').src =
+          'https://www.youtube.com/embed/' + data.videoId + '?autoplay=0&rel=0&modestbranding=1';
+        document.getElementById('modal-drill-yt-link').href =
+          'https://www.youtube.com/watch?v=' + data.videoId;
+        var meta = data.title + (data.channel ? ' · ' + data.channel : '') + (data.views ? ' · ' + data.views : '');
+        document.getElementById('drill-video-meta').textContent = meta;
+      } else {
+        document.getElementById('drill-video-loading').innerHTML =
+          '<p class="text-gray-500 text-sm">No video found for this drill.</p>';
+      }
+    })
+    .catch(function() {
+      document.getElementById('drill-video-loading').innerHTML =
+        '<p class="text-gray-500 text-sm">Could not load video.</p>';
+    });
   
   const stepsList = document.getElementById('modal-drill-steps');
   stepsList.innerHTML = drill.steps.map((s, i) => 
@@ -230,6 +251,8 @@ function openDrill(id) {
 function closeDrillModal() {
   document.getElementById('drill-video-iframe').src = '';
   document.getElementById('drill-video-loading').style.display = 'flex';
+  document.getElementById('drill-video-loading').innerHTML = '<div class="w-8 h-8 border-2 border-accent-600 border-t-transparent rounded-full animate-spin mb-2"></div><p class="text-gray-400 text-xs">Finding top video...</p>';
+  document.getElementById('drill-video-meta').textContent = '';
   document.getElementById('drill-modal').style.display = 'none';
   document.body.style.overflow = '';
 }

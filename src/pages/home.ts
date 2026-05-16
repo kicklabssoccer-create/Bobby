@@ -318,57 +318,65 @@ export function homePage() {
         </button>
       </div>
     </div>
-    <!-- Search refinement bar -->
-    <div class="px-4 py-2 border-b border-white/5 flex-shrink-0 flex items-center gap-2 bg-midnight/50">
-      <i class="fas fa-search text-gray-500 text-xs"></i>
-      <input id="modal-search-input" type="text" placeholder="Refine your search..." 
-        class="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-600"
-        onkeydown="if(event.key==='Enter')refineSearch()">
-      <button onclick="refineSearch()" class="text-xs bg-accent-600 hover:bg-accent-500 text-white px-3 py-1 rounded-md transition-colors">Search</button>
-    </div>
-    <!-- YouTube search iframe -->
-    <div class="relative flex-1" style="min-height:480px">
-      <div id="modal-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-midnight z-10">
-        <div class="w-10 h-10 border-2 border-accent-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-gray-400 text-sm">Loading soccer videos...</p>
+    <!-- Hidden input for compat -->
+    <input id="modal-search-input" type="hidden">
+    <!-- YouTube embed area -->
+    <div class="relative flex-1" style="min-height:0">
+      <div id="modal-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-midnight z-10" style="min-height:320px">
+        <div style="width:40px;height:40px;border:3px solid #16a34a;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px"></div>
+        <p style="color:#9ca3af;font-size:13px">Finding top video...</p>
       </div>
-      <iframe id="modal-iframe" 
-        width="100%" height="100%" 
-        frameborder="0"
-        style="min-height:480px"
-        onload="document.getElementById('modal-loading').style.display='none'">
-      </iframe>
+      <div style="position:relative;padding-bottom:56.25%;height:0;background:#000">
+        <iframe id="modal-iframe"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          onload="if(this.src)document.getElementById('modal-loading').style.display='none'">
+        </iframe>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-var _currentQuery = '';
+var _homeVidCache = {};
 function openVideoSearch(query, title) {
-  _currentQuery = query;
-  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
-  document.getElementById('modal-iframe').src = ytUrl;
   document.getElementById('modal-video-title').textContent = title;
-  document.getElementById('modal-yt-link').href = ytUrl;
   document.getElementById('modal-search-input').value = query;
   document.getElementById('modal-loading').style.display = 'flex';
+  document.getElementById('modal-loading').innerHTML = '<div style="width:40px;height:40px;border:3px solid #16a34a;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px"></div><p style="color:#9ca3af;font-size:13px">Finding top video...</p>';
+  document.getElementById('modal-iframe').src = '';
+  document.getElementById('modal-yt-link').href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
   document.getElementById('video-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+
+  if (_homeVidCache[query]) {
+    applyHomeVideo(_homeVidCache[query], query);
+    return;
+  }
+  fetch('/api/youtube-top?q=' + encodeURIComponent(query))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.videoId) {
+        _homeVidCache[query] = data;
+        applyHomeVideo(data, query);
+      } else {
+        document.getElementById('modal-loading').innerHTML = '<p style="color:#9ca3af;font-size:13px">No video found.</p>';
+      }
+    })
+    .catch(function() {
+      document.getElementById('modal-loading').innerHTML = '<p style="color:#9ca3af;font-size:13px">Could not load video.</p>';
+    });
 }
-function refineSearch() {
-  var q = document.getElementById('modal-search-input').value.trim();
-  if (!q) return;
-  _currentQuery = q;
-  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
-  document.getElementById('modal-iframe').src = ytUrl;
-  document.getElementById('modal-yt-link').href = ytUrl;
-  document.getElementById('modal-loading').style.display = 'flex';
+function applyHomeVideo(data, query) {
+  document.getElementById('modal-iframe').src = 'https://www.youtube.com/embed/' + data.videoId + '?autoplay=1&rel=0&modestbranding=1';
+  document.getElementById('modal-yt-link').href = 'https://www.youtube.com/watch?v=' + data.videoId;
+  if (data.title) document.getElementById('modal-video-title').textContent = data.title;
 }
 function closeVideoModal() {
   document.getElementById('modal-iframe').src = '';
   document.getElementById('video-modal').style.display = 'none';
   document.body.style.overflow = '';
-  document.getElementById('modal-loading').style.display = 'flex';
 }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeVideoModal(); });
 </script>

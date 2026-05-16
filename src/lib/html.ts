@@ -78,6 +78,7 @@ export const GLOBAL_STYLES = `
   .nav-link-inactive { color: #9ca3af; }
   .nav-link-inactive:hover { color: #ffffff; background: rgba(255,255,255,0.05); }
   .hero-grid-bg { background-image: repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,0.03) 60px,rgba(255,255,255,0.03) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,255,255,0.03) 60px,rgba(255,255,255,0.03) 61px); }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 `;
 
