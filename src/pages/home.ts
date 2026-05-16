@@ -287,11 +287,18 @@ export function homePage() {
     </div>
     <h2 class="font-oswald text-4xl font-bold text-white mb-4">INSTAGRAM</h2>
     <p class="text-gray-400 text-lg mb-2">⚽ Daily drills, training tips & player highlights</p>
-    <p class="text-gray-500 mb-8">Follow for free content → subscribe for full access</p>
-    <a href="https://www.instagram.com/kicklabs.soccer/" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white font-bold px-8 py-4 rounded-xl text-base transition-all hover:opacity-90 hover:shadow-2xl hover:shadow-pink-500/20">
-      <i class="fab fa-instagram text-lg"></i> Follow @kicklabs.soccer
-    </a>
-    <p class="text-gray-600 text-sm mt-6">Follow <strong class="text-gray-400">@kicklabs.soccer</strong> for daily free drills, tutorials & challenges</p>
+    <p class="text-gray-500 mb-8">Follow us for free content, training clips & player highlights</p>
+    <!-- Coming soon badge -->
+    <div class="inline-flex flex-col items-center gap-4">
+      <div class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-orange-400/20 border border-pink-500/30 text-white font-bold px-8 py-4 rounded-xl text-base">
+        <i class="fab fa-instagram text-2xl text-pink-400"></i>
+        <div class="text-left">
+          <p class="text-white font-bold">@kicklabs.soccer</p>
+          <p class="text-pink-400 text-sm font-semibold tracking-widest uppercase">Coming Soon</p>
+        </div>
+      </div>
+      <p class="text-slate-600 text-sm">We're setting up our page — check back soon for daily drills & highlights</p>
+    </div>
   </div>
 </section>
 
