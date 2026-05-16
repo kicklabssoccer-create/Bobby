@@ -37,7 +37,7 @@ export type KickPayment = {
   name: string;
   plan: string;
   amount: string;
-  method: 'venmo' | 'card' | 'zelle' | 'paypal';
+  method: 'venmo' | 'card' | 'zelle' | 'paypal' | 'manual';
   venmoHandle?: string;
   status: 'pending' | 'confirmed' | 'failed';
   createdAt: string;
@@ -253,7 +253,7 @@ export function computeStats(users: KickUser[], payments: KickPayment[]) {
   }
 
   // Revenue calculation (monthly)
-  const PRICES = { starter: 9, pro: 19, elite: 29 };
+  const PRICES = { starter: 9.99, pro: 19.99, elite: 34.99 };
   const mrr = users.reduce((sum, u) => {
     return sum + (PRICES[u.plan as keyof typeof PRICES] || 0);
   }, 0);

@@ -83,9 +83,9 @@ export function loginPage() {
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-sm mx-4 p-8 text-center">
     <i class="fas fa-envelope text-accent-400 text-3xl mb-4"></i>
     <h3 class="font-oswald text-2xl font-bold text-white mb-2">Reset Password</h3>
-    <p class="text-gray-400 text-sm mb-5">Enter your email and we'll send you a reset link.</p>
+    <p class="text-gray-400 text-sm mb-5">Enter your email and we'll send you instructions via our support email.</p>
     <input type="email" id="forgot-email" placeholder="your@email.com" class="w-full bg-panel border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 mb-4">
-    <button onclick="sendResetEmail()" class="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-3 rounded-xl transition-all text-sm mb-3">Send Reset Link</button>
+    <button onclick="sendResetEmail()" class="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-3 rounded-xl transition-all text-sm mb-3">Contact Support to Reset</button>
     <button onclick="closeForgot()" class="w-full text-gray-500 hover:text-white text-sm py-2 transition-colors">Cancel</button>
   </div>
 </div>
@@ -159,11 +159,13 @@ function sendResetEmail() {
   const email = document.getElementById('forgot-email').value.trim();
   if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
   closeForgot();
+  // No automated email service — direct to support email
+  window.location.href = 'mailto:kicklabs.soccer@gmail.com?subject=Password Reset Request&body=Hi, I need a password reset for my account: ' + encodeURIComponent(email);
   const toast = document.createElement('div');
-  toast.className = 'fixed top-20 right-4 bg-green-500/20 border border-green-500/30 text-green-300 text-sm px-4 py-3 rounded-xl z-[200] flex items-center gap-2';
-  toast.innerHTML = '<i class="fas fa-check-circle"></i> If that email exists, a reset link has been sent.';
+  toast.className = 'fixed top-20 right-4 bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm px-4 py-3 rounded-xl z-[200] flex items-center gap-2';
+  toast.innerHTML = '<i class="fas fa-envelope"></i> Opening your email to contact support...';
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  setTimeout(() => toast.remove(), 5000);
 }
 
 // Auto-redirect if already logged in (check API session)

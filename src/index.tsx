@@ -294,9 +294,9 @@ app.post('/api/auth/logout', async (c) => {
 
 // ─── PAYMENT API ──────────────────────────────────────────────────
 const PLAN_PRICES: Record<string, { monthly: number; annual: number }> = {
-  starter: { monthly: 9,  annual: 7  },
-  pro:     { monthly: 19, annual: 15 },
-  elite:   { monthly: 29, annual: 23 },
+  starter: { monthly: 9.99,  annual: 7.99  },
+  pro:     { monthly: 19.99, annual: 15.99 },
+  elite:   { monthly: 34.99, annual: 27.99 },
 }
 
 // POST /api/payment/initiate — creates a pending payment record

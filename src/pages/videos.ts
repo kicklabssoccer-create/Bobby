@@ -11,6 +11,7 @@ const TOPICS = [
     id: 'ball-control-beg',
     label: 'Ball Control — Beginner',
     level: 'Beginner', category: 'Ball Control', plan: 'free', emoji: '⚽',
+    query: 'soccer ball control training beginner drills',
     desc: 'Master first touch and close control fundamentals.',
     videos: [
       { id: 'nckkvbxgnUM', title: '15 Min Soccer Training | Ball Control Made Easy', ch: 'Joner Football' },
@@ -23,6 +24,7 @@ const TOPICS = [
     id: 'dribbling-beg',
     label: 'Dribbling — Beginner',
     level: 'Beginner', category: 'Dribbling', plan: 'free', emoji: '🏃',
+    query: 'how to dribble a soccer ball for beginners tutorial',
     desc: 'Learn to dribble past defenders with confidence.',
     videos: [
       { id: 'nPTnDkMPHN4', title: '5 Moves To Beat Defenders — Step By Step Tutorial', ch: 'Skills Tutorial' },
@@ -35,6 +37,7 @@ const TOPICS = [
     id: 'passing-beg-free',
     label: 'Passing — Fundamentals',
     level: 'Beginner', category: 'Passing', plan: 'free', emoji: '↗️',
+    query: 'soccer passing drills beginner intermediate tutorial',
     desc: 'Build accurate short passing technique from scratch.',
     videos: [
       { id: 'wqxRMvArEos', title: '3 Passing Drills You Must Try',                    ch: 'Joner Football' },
@@ -47,6 +50,7 @@ const TOPICS = [
     id: 'youth-fun',
     label: 'Fun Youth Soccer Drills',
     level: 'Beginner', category: 'Youth', plan: 'free', emoji: '🧒',
+    query: 'fun soccer games for kids youth training drills',
     desc: 'Engaging games and drills designed for young players.',
     videos: [
       { id: 'RMiQSRNXAwI', title: 'Important Soccer Training for Kids',               ch: 'Joner Football' },
@@ -61,6 +65,7 @@ const TOPICS = [
     id: 'ball-mastery-int',
     label: 'Ball Mastery — Intermediate',
     level: 'Intermediate', category: 'Ball Control', plan: 'starter', emoji: '⚽',
+    query: 'soccer ball mastery exercises intermediate training',
     desc: 'Advanced touch drills to dominate tight spaces.',
     videos: [
       { id: 'aVfSZ8vyD7Y', title: 'Best Soccer Drills 2024 — Full Session',           ch: 'Joner Football' },
@@ -73,6 +78,7 @@ const TOPICS = [
     id: 'passing-combos',
     label: 'Passing Combinations',
     level: 'Beginner', category: 'Passing', plan: 'starter', emoji: '↗️',
+    query: 'soccer passing combinations drills intermediate advanced',
     desc: 'Two-touch combinations and wall-pass patterns.',
     videos: [
       { id: '-y60mqjQw-k', title: 'Dribbling & Passing Combination Drills',            ch: 'Soccer Drills' },
@@ -85,6 +91,7 @@ const TOPICS = [
     id: 'shooting-beg',
     label: 'Shooting — Beginner',
     level: 'Beginner', category: 'Shooting', plan: 'starter', emoji: '🥅',
+    query: 'soccer shooting drills beginner how to shoot tutorial',
     desc: 'Learn to strike a ball with power and placement.',
     videos: [
       { id: 'CVF_qsuac6E', title: '5 Essential Shooting Drills Kids Must Master',     ch: 'Online Soccer Academy' },
@@ -97,6 +104,7 @@ const TOPICS = [
     id: 'dribbling-int',
     label: 'Dribbling — Intermediate 1v1',
     level: 'Intermediate', category: 'Dribbling', plan: 'starter', emoji: '🏃',
+    query: 'dribbling intermediate soccer training beat defenders',
     desc: '1v1 skills and directional changes to beat defenders.',
     videos: [
       { id: 'z2-ka1B-Izc', title: 'Dribble Past Defenders and Score With These Moves', ch: 'Skills Tutorial' },
@@ -109,6 +117,7 @@ const TOPICS = [
     id: 'defending-beg',
     label: 'Defending — Basics',
     level: 'Beginner', category: 'Defending', plan: 'starter', emoji: '🛡️',
+    query: 'soccer defending basics tutorial beginner intermediate',
     desc: 'Body positioning, jockeying and basic tackle technique.',
     videos: [
       { id: 'LR9ifmPXGhI', title: 'How to Defend in Soccer: 3 Drills for Better Defending', ch: 'Soccer Coach' },
@@ -121,6 +130,7 @@ const TOPICS = [
     id: 'fitness-beg',
     label: 'Soccer Fitness — Conditioning',
     level: 'Beginner', category: 'Fitness', plan: 'starter', emoji: '💪',
+    query: 'soccer fitness training conditioning drills tutorial',
     desc: 'Build the stamina and strength to play 90 minutes.',
     videos: [
       { id: 'wq5SipkAgXU', title: 'Soccer Speed and Agility — Part One',              ch: 'Soccer Training' },
@@ -133,6 +143,7 @@ const TOPICS = [
     id: 'goalkeeper-beg',
     label: 'Goalkeeper — Basics',
     level: 'Beginner', category: 'Goalkeeper', plan: 'starter', emoji: '🧤',
+    query: 'goalkeeper training drills tutorial beginner intermediate',
     desc: 'Shot-stopping, positioning and basic distribution.',
     videos: [
       { id: 'sn0KE6pmu4c', title: 'Youth Goalkeeper Training for Beginners at Home',  ch: 'GK Training' },
@@ -145,6 +156,7 @@ const TOPICS = [
     id: 'youth-dev',
     label: 'Youth Development — U12/U14',
     level: 'Intermediate', category: 'Youth', plan: 'starter', emoji: '🧒',
+    query: 'youth soccer drills kids fun training session',
     desc: 'Age-appropriate drills to develop well-rounded young players.',
     videos: [
       { id: 'RMiQSRNXAwI', title: 'Important Soccer Training for Kids',               ch: 'Joner Football' },
@@ -159,6 +171,7 @@ const TOPICS = [
     id: 'ball-control-adv',
     label: 'Ball Control — Advanced',
     level: 'Advanced', category: 'Ball Control', plan: 'pro', emoji: '⚽',
+    query: 'advanced ball control soccer close control mastery',
     desc: 'Elite close control drills used by professional players.',
     videos: [
       { id: 'aVfSZ8vyD7Y', title: 'Best Soccer Drills 2024 — Full Pro Session',       ch: 'Joner Football' },
@@ -171,6 +184,7 @@ const TOPICS = [
     id: 'passing-rondos',
     label: 'Passing — Rondos & Vision',
     level: 'Intermediate', category: 'Passing', plan: 'pro', emoji: '↗️',
+    query: 'soccer passing combinations drills intermediate advanced',
     desc: 'Rondo games and scanning drills to improve vision.',
     videos: [
       { id: '-y60mqjQw-k', title: 'Dribbling & Passing Combination Drills',            ch: 'Soccer Drills' },
@@ -183,6 +197,7 @@ const TOPICS = [
     id: 'shooting-int',
     label: 'Shooting — Power & Accuracy',
     level: 'Intermediate', category: 'Shooting', plan: 'pro', emoji: '🥅',
+    query: 'soccer shooting intermediate finishing drills tutorial',
     desc: 'Finishing under pressure with both feet.',
     videos: [
       { id: 'CVF_qsuac6E', title: '5 Essential Shooting Drills — Score More Goals',   ch: 'Online Soccer Academy' },
@@ -195,6 +210,7 @@ const TOPICS = [
     id: 'defending-1v1',
     label: '1v1 Defending Masterclass',
     level: 'Intermediate', category: 'Defending', plan: 'pro', emoji: '🛡️',
+    query: 'soccer defending basics tutorial beginner intermediate',
     desc: 'Outthink attackers and win 1v1 duels consistently.',
     videos: [
       { id: 'XZ-eHQn_0ys', title: '4 Elite Defensive Drills — Master Defending',      ch: 'Soccer Tactics' },
@@ -207,6 +223,7 @@ const TOPICS = [
     id: 'tactics-formations',
     label: 'Tactics — Formations & Roles',
     level: 'Beginner', category: 'Tactics', plan: 'pro', emoji: '🧠',
+    query: 'soccer tactics beginner formations positions tutorial',
     desc: 'Understand formations and your role in each system.',
     videos: [
       { id: 'Bo3mEAN0OZM', title: 'High Pressing Defending Session for Youth Players', ch: 'Modern Soccer Coach' },
@@ -219,6 +236,7 @@ const TOPICS = [
     id: 'tactics-reading',
     label: 'Tactics — Reading the Game',
     level: 'Intermediate', category: 'Tactics', plan: 'pro', emoji: '🧠',
+    query: 'soccer tactics intermediate pressing possession tutorial',
     desc: 'Improve decision-making speed and game intelligence.',
     videos: [
       { id: '4Ge4cACZmtc', title: 'Pressing for Glory — Tactical Session',            ch: 'Soccer Coaching' },
@@ -231,6 +249,7 @@ const TOPICS = [
     id: 'speed-agility',
     label: 'Speed & Agility Training',
     level: 'Intermediate', category: 'Fitness', plan: 'pro', emoji: '💪',
+    query: 'soccer speed agility training drills tutorial',
     desc: 'Ladder, cone, and sprint drills to boost pace.',
     videos: [
       { id: 'wq5SipkAgXU', title: 'Soccer Speed and Agility — Part One',              ch: 'Soccer Training' },
@@ -243,6 +262,7 @@ const TOPICS = [
     id: 'goalkeeper-adv',
     label: 'Goalkeeper — Advanced',
     level: 'Advanced', category: 'Goalkeeper', plan: 'pro', emoji: '🧤',
+    query: 'goalkeeper advanced training drills saves tutorial',
     desc: 'Reaction saves, sweeper-keeper play and long distribution.',
     videos: [
       { id: 'D6cVv0V1hug', title: 'Goalkeeper Fitness Drills and Handling',           ch: "Conor O'Keefe GK" },
@@ -255,6 +275,7 @@ const TOPICS = [
     id: 'mental-focus',
     label: 'Mental Toughness & Focus',
     level: 'All Levels', category: 'Mental', plan: 'pro', emoji: '🧘',
+    query: 'soccer mental training focus confidence tutorial',
     desc: 'Pre-match routines, confidence and composure training.',
     videos: [
       { id: 'kcpxjWBQQVc', title: '11 Essential Soccer Drills — Mindset & Execution', ch: 'Progressive Soccer' },
@@ -269,6 +290,7 @@ const TOPICS = [
     id: 'dribbling-elite',
     label: 'Dribbling — Elite Moves',
     level: 'Advanced', category: 'Dribbling', plan: 'elite', emoji: '🏃',
+    query: 'advanced dribbling soccer 1v1 elite tutorial',
     desc: 'Pro-level skill moves used in high-pressure matches.',
     videos: [
       { id: 'z2-ka1B-Izc', title: 'Dribble Past Defenders and Score',                 ch: 'Advanced Skills' },
@@ -281,6 +303,7 @@ const TOPICS = [
     id: 'passing-longball',
     label: 'Long Ball & Switching Play',
     level: 'Advanced', category: 'Passing', plan: 'elite', emoji: '↗️',
+    query: 'long ball switching play soccer advanced tutorial',
     desc: 'Strike and execute long balls to switch play at speed.',
     videos: [
       { id: 'hd8-JBHD-v4', title: 'Full Partner Training — Long Passes & Crossing',   ch: 'Soccer Training' },
@@ -293,6 +316,7 @@ const TOPICS = [
     id: 'shooting-adv',
     label: 'Advanced Finishing — All Angles',
     level: 'Advanced', category: 'Shooting', plan: 'elite', emoji: '🥅',
+    query: 'advanced finishing soccer elite shooting tutorial',
     desc: 'Tight angles, volleys, long-range and one-on-ones.',
     videos: [
       { id: 'CVF_qsuac6E', title: '5 Essential Shooting Drills — Advanced Finishing',  ch: 'Online Soccer Academy' },
@@ -305,6 +329,7 @@ const TOPICS = [
     id: 'defending-adv',
     label: 'Defending — Zonal & Man-Marking',
     level: 'Advanced', category: 'Defending', plan: 'elite', emoji: '🛡️',
+    query: 'zonal defending soccer advanced tactics tutorial',
     desc: 'Master both defensive systems and switch between them.',
     videos: [
       { id: 'XZ-eHQn_0ys', title: '4 Elite Defensive Drills — Modern Defending',      ch: 'Soccer Tactics' },
@@ -317,6 +342,7 @@ const TOPICS = [
     id: 'tactics-highpress',
     label: 'High Press & Gegenpressing',
     level: 'Advanced', category: 'Tactics', plan: 'elite', emoji: '🧠',
+    query: 'high press soccer elite tactics pressing tutorial',
     desc: 'Pressing traps and winning possession high up the pitch.',
     videos: [
       { id: '4Ge4cACZmtc', title: 'Pressing for Glory — High Press Tactics',          ch: 'Soccer Coaching' },
@@ -329,6 +355,7 @@ const TOPICS = [
     id: 'fitness-elite',
     label: 'Elite Conditioning Program',
     level: 'Advanced', category: 'Fitness', plan: 'elite', emoji: '💪',
+    query: 'elite soccer conditioning fitness sprint tutorial',
     desc: 'Yo-Yo intervals, plyometrics and sprints for peak fitness.',
     videos: [
       { id: 'B9kUH_0LOtU', title: 'High-Tempo Speed & Agility — Elite Level',        ch: 'Modern Soccer Coach' },
@@ -341,6 +368,7 @@ const TOPICS = [
     id: 'mental-elite',
     label: 'Elite Mental Performance',
     level: 'Advanced', category: 'Mental', plan: 'elite', emoji: '🧘',
+    query: 'elite mental performance soccer mindset tutorial',
     desc: 'Elite psychological frameworks used by professional athletes.',
     videos: [
       { id: 'BJJb3-O0Q1U', title: 'Learn 69 Football Skills — Elite Mindset',         ch: 'Soccer Skills' },
@@ -353,6 +381,7 @@ const TOPICS = [
     id: 'youth-elite',
     label: 'Youth Advanced — U16/U18',
     level: 'Advanced', category: 'Youth', plan: 'elite', emoji: '🧒',
+    query: 'advanced youth soccer training elite development',
     desc: 'Transition to adult football with elite youth sessions.',
     videos: [
       { id: 'BJJb3-O0Q1U', title: 'Learn 69 Football Skills — U16/U18 Level',        ch: 'Soccer Skills' },
