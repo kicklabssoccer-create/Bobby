@@ -12,6 +12,7 @@ export function adminShell(opts: {
     { id: 'drills',     href: '/admin/drills',     icon: 'fas fa-dumbbell',       label: 'Drills'     },
     { id: 'videos',     href: '/admin/videos',     icon: 'fas fa-play-circle',    label: 'Videos'     },
     { id: 'products',   href: '/admin/products',   icon: 'fas fa-shopping-cart',  label: 'Products'   },
+    { id: 'payments',   href: '/admin/payments',   icon: 'fas fa-credit-card',    label: 'Payments'   },
     { id: 'plans',      href: '/admin/plans',      icon: 'fas fa-tag',            label: 'Plans'      },
     { id: 'settings',   href: '/admin/settings',   icon: 'fas fa-cog',            label: 'Settings'   },
   ]

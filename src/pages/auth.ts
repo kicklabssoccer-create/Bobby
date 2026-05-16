@@ -21,7 +21,7 @@ export function loginPage() {
 
     <div class="bg-panel border border-white/10 rounded-2xl p-8">
       <!-- Error alert -->
-      <div id="login-error" class="hidden bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex items-center gap-2">
+      <div id="login-error" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex items-center gap-2" style="display:none">
         <i class="fas fa-exclamation-circle text-red-400 text-sm flex-shrink-0"></i>
         <span id="login-error-msg" class="text-red-300 text-sm"></span>
       </div>
@@ -91,44 +91,46 @@ export function loginPage() {
 </div>
 
 <script>
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const btn = document.getElementById('login-btn');
-  
-  if (!email || !email.includes('@')) {
-    showLoginError('Please enter a valid email address.');
-    return;
-  }
-  if (!password) {
-    showLoginError('Please enter your password.');
-    return;
-  }
-  
+
+  if (!email || !email.includes('@')) { showLoginError('Please enter a valid email address.'); return; }
+  if (!password) { showLoginError('Please enter your password.'); return; }
+
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
   btn.disabled = true;
-  
-  setTimeout(() => {
-    // Check if user exists in localStorage
-    const stored = localStorage.getItem('kicklab_user');
-    if (stored) {
-      const user = JSON.parse(stored);
-      if (user.email === email) {
-        window.location.href = '/dashboard';
-        return;
-      }
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showLoginError(data.error || 'Invalid email or password.');
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+      btn.disabled = false;
+      return;
     }
-    // Create a new session for demo purposes
-    const user = { email, name: email.split('@')[0], plan: 'free', joined: new Date().toISOString(), streak: 0, sessionsCompleted: 0 };
-    localStorage.setItem('kicklab_user', JSON.stringify(user));
+
+    // Store minimal info in localStorage for UI convenience
+    localStorage.setItem('kicklab_user', JSON.stringify(data.user));
     window.location.href = '/dashboard';
-  }, 1200);
+  } catch (err) {
+    showLoginError('Network error. Please try again.');
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+    btn.disabled = false;
+  }
 }
 
 function showLoginError(msg) {
   document.getElementById('login-error-msg').textContent = msg;
-  document.getElementById('login-error').classList.remove('hidden');
+  document.getElementById('login-error').style.display = 'flex';
 }
 
 function togglePassword(inputId, btn) {
@@ -151,25 +153,25 @@ function showForgotPassword() {
 function closeForgot() {
   document.getElementById('forgot-modal').style.display = 'none';
   document.body.style.overflow = '';
-  document.getElementById('forgot-modal').classList.remove('flex');
 }
 
 function sendResetEmail() {
   const email = document.getElementById('forgot-email').value.trim();
   if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
   closeForgot();
-  // Show success toast
   const toast = document.createElement('div');
   toast.className = 'fixed top-20 right-4 bg-green-500/20 border border-green-500/30 text-green-300 text-sm px-4 py-3 rounded-xl z-[200] flex items-center gap-2';
-  toast.innerHTML = '<i class="fas fa-check-circle"></i> Reset link sent to ' + email;
+  toast.innerHTML = '<i class="fas fa-check-circle"></i> If that email exists, a reset link has been sent.';
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 4000);
 }
 
-// Auto-redirect if already logged in
-document.addEventListener('DOMContentLoaded', () => {
-  const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
-  if (user) window.location.href = '/dashboard';
+// Auto-redirect if already logged in (check API session)
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/auth/me');
+    if (res.ok) window.location.href = '/dashboard';
+  } catch(e) {}
 });
 </script>
 `
@@ -185,7 +187,7 @@ export function signupPage() {
   <div class="absolute inset-0 opacity-5 hero-grid-bg"></div>
   <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent-600/5 rounded-full blur-3xl pointer-events-none"></div>
 
-  <div class="relative z-10 w-full max-w-md mx-4">
+  <div class="relative z-10 w-full max-w-lg mx-4">
     <div class="text-center mb-8">
       <div class="w-14 h-14 bg-accent-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <span class="text-3xl">⚽</span>
@@ -195,40 +197,101 @@ export function signupPage() {
     </div>
 
     <div class="bg-panel border border-white/10 rounded-2xl p-8">
-      <div id="signup-error" class="hidden bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex items-center gap-2">
+      <div id="signup-error" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex items-center gap-2" style="display:none">
         <i class="fas fa-exclamation-circle text-red-400 text-sm flex-shrink-0"></i>
         <span id="signup-error-msg" class="text-red-300 text-sm"></span>
       </div>
 
       <form id="signup-form" onsubmit="handleSignup(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label class="block text-gray-400 text-sm font-medium mb-1.5">Full Name</label>
-            <input type="text" id="signup-name" placeholder="Your full name" required
-              class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+        <!-- Step 1: Basic Info -->
+        <div class="mb-5">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 bg-accent-600 rounded-full flex items-center justify-center text-xs font-bold text-white">1</div>
+            <span class="text-white font-semibold text-sm">Basic Information</span>
           </div>
-          <div>
-            <label class="block text-gray-400 text-sm font-medium mb-1.5">Email Address</label>
-            <input type="email" id="signup-email" placeholder="you@example.com" required
-              class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
-          </div>
-          <div>
-            <label class="block text-gray-400 text-sm font-medium mb-1.5">Password</label>
-            <div class="relative">
-              <input type="password" id="signup-password" placeholder="Minimum 8 characters" required
-                class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 pr-11 text-white text-sm placeholder-gray-600 transition-colors">
-              <button type="button" onclick="togglePwd('signup-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
-                <i class="fas fa-eye text-sm"></i>
-              </button>
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Full Name *</label>
+                <input type="text" id="signup-name" placeholder="Your full name" required
+                  class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Phone (optional)</label>
+                <input type="tel" id="signup-phone" placeholder="+1 (555) 000-0000"
+                  class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 text-xs font-medium mb-1">Email Address *</label>
+              <input type="email" id="signup-email" placeholder="you@example.com" required
+                class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+            </div>
+            <div>
+              <label class="block text-gray-400 text-xs font-medium mb-1">Password *</label>
+              <div class="relative">
+                <input type="password" id="signup-password" placeholder="Minimum 8 characters" required
+                  class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 pr-11 text-white text-sm placeholder-gray-600 transition-colors">
+                <button type="button" onclick="togglePwd('signup-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  <i class="fas fa-eye text-sm"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <div>
-            <label class="block text-gray-400 text-sm font-medium mb-1.5">Skill Level</label>
-            <select id="signup-level" class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
-              <option value="beginner">🌱 Beginner (just starting out)</option>
-              <option value="intermediate">⚡ Intermediate (1–3 years playing)</option>
-              <option value="advanced">🏆 Advanced (competitive player)</option>
-            </select>
+        </div>
+
+        <!-- Step 2: Player Profile -->
+        <div class="mb-5">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 bg-accent-600 rounded-full flex items-center justify-center text-xs font-bold text-white">2</div>
+            <span class="text-white font-semibold text-sm">Player Profile <span class="text-gray-600 font-normal">(helps us personalize your training)</span></span>
+          </div>
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Gender</label>
+                <select id="signup-gender" class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
+                  <option value="prefer_not">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Age Range</label>
+                <select id="signup-age" class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
+                  <option value="under_13">Under 13</option>
+                  <option value="13_17">13–17</option>
+                  <option value="18_24" selected>18–24</option>
+                  <option value="25_34">25–34</option>
+                  <option value="35_44">35–44</option>
+                  <option value="45_plus">45+</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Skill Level</label>
+                <select id="signup-level" class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
+                  <option value="beginner">🌱 Beginner</option>
+                  <option value="intermediate">⚡ Intermediate</option>
+                  <option value="advanced">🏆 Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-400 text-xs font-medium mb-1">Location (City, State)</label>
+                <input type="text" id="signup-location" placeholder="e.g. Miami, FL"
+                  class="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-400 text-xs font-medium mb-1">Venmo Handle (optional — for subscription payments)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-semibold">@</span>
+                <input type="text" id="signup-venmo" placeholder="your-venmo-handle"
+                  class="w-full bg-midnight border border-white/10 rounded-xl pl-8 pr-4 py-3 text-white text-sm placeholder-gray-600 transition-colors">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -257,31 +320,54 @@ export function signupPage() {
 </section>
 
 <script>
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
-  const level = document.getElementById('signup-level').value;
+  const level    = document.getElementById('signup-level').value;
+  const gender   = document.getElementById('signup-gender').value;
+  const age      = document.getElementById('signup-age').value;
+  const location = document.getElementById('signup-location').value.trim();
+  const phone    = document.getElementById('signup-phone').value.trim();
+  const venmoHandle = document.getElementById('signup-venmo').value.trim();
   const btn = document.getElementById('signup-btn');
 
-  if (!name) { showSignupError('Please enter your full name.'); return; }
+  if (!name)                         { showSignupError('Please enter your full name.'); return; }
   if (!email || !email.includes('@')) { showSignupError('Please enter a valid email address.'); return; }
   if (!password || password.length < 8) { showSignupError('Password must be at least 8 characters.'); return; }
 
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
   btn.disabled = true;
 
-  setTimeout(() => {
-    const user = { name, email, plan: 'free', level, joined: new Date().toISOString(), streak: 0, sessionsCompleted: 0, lastSession: null };
-    localStorage.setItem('kicklab_user', JSON.stringify(user));
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, level, gender, age, location, phone, venmoHandle })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showSignupError(data.error || 'Could not create account. Please try again.');
+      btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Free Account';
+      btn.disabled = false;
+      return;
+    }
+
+    // Store minimal info in localStorage for UI convenience
+    localStorage.setItem('kicklab_user', JSON.stringify(data.user));
     window.location.href = '/dashboard';
-  }, 1200);
+  } catch(err) {
+    showSignupError('Network error. Please try again.');
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Free Account';
+    btn.disabled = false;
+  }
 }
 
 function showSignupError(msg) {
   document.getElementById('signup-error-msg').textContent = msg;
-  document.getElementById('signup-error').classList.remove('hidden');
+  document.getElementById('signup-error').style.display = 'flex';
 }
 
 function togglePwd(inputId, btn) {
@@ -296,9 +382,12 @@ function togglePwd(inputId, btn) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
-  if (user) window.location.href = '/dashboard';
+// Auto-redirect if already logged in (check API session)
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/auth/me');
+    if (res.ok) window.location.href = '/dashboard';
+  } catch(e) {}
 });
 </script>
 `
