@@ -419,6 +419,84 @@ app.get('/api/admin/users', async (c) => {
   return c.json({ ok: true, users: safe, total: safe.length })
 })
 
+// DELETE /api/admin/users/all — wipe all users except the admin account
+app.delete('/api/admin/users/all', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const ADMIN_EMAIL = ADMIN_USERNAME.toLowerCase()
+  const indexRaw = await kv.get('user_index')
+  const emails: string[] = indexRaw ? JSON.parse(indexRaw) : []
+  // Delete every user except the admin account
+  await Promise.all(emails.filter(e => e !== ADMIN_EMAIL).map(e => kv.delete(`user:${e}`)))
+  const kept = emails.filter(e => e === ADMIN_EMAIL)
+  await kv.put('user_index', JSON.stringify(kept))
+  return c.json({ ok: true, deleted: emails.length - kept.length })
+})
+
+// DELETE /api/admin/users/:email — delete a single user
+app.delete('/api/admin/users/:email', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const email = decodeURIComponent(c.req.param('email')).toLowerCase()
+  await kv.delete(`user:${email}`)
+  const indexRaw = await kv.get('user_index')
+  const index: string[] = indexRaw ? JSON.parse(indexRaw) : []
+  await kv.put('user_index', JSON.stringify(index.filter(e => e !== email)))
+  return c.json({ ok: true })
+})
+
+// PUT /api/admin/users/:email — update user name / plan
+app.put('/api/admin/users/:email', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const email = decodeURIComponent(c.req.param('email')).toLowerCase()
+  const user = await getUser(kv, email)
+  if (!user) return c.json({ error: 'User not found' }, 404)
+  const body = await c.req.json() as any
+  // Only allow safe fields to be updated
+  const { name, plan } = body
+  if (name) user.name = name.trim()
+  if (plan && ['free','starter','pro','elite'].includes(plan)) user.plan = plan as KickUser['plan']
+  await saveUser(kv, user)
+  return c.json({ ok: true })
+})
+
+// POST /api/admin/users — create a new user
+app.post('/api/admin/users', async (c) => {
+  const authErr = await requireAdminAPI(c)
+  if (authErr) return authErr
+  const kv = c.env.KICKLAB_KV
+  if (!kv) return c.json({ error: 'Storage unavailable' }, 503)
+  const body = await c.req.json() as any
+  const { name, email, plan, password } = body
+  if (!name || !email) return c.json({ error: 'Name and email are required' }, 400)
+  const existing = await getUser(kv, email)
+  if (existing) return c.json({ error: 'A user with that email already exists' }, 409)
+  const user: KickUser = {
+    id: crypto.randomUUID(),
+    email: email.toLowerCase().trim(),
+    name: name.trim(),
+    passwordHash: await hashPassword(password || crypto.randomUUID()),
+    plan: (['free','starter','pro','elite'].includes(plan) ? plan : 'free') as KickUser['plan'],
+    gender: 'prefer_not',
+    age: 'prefer_not',
+    location: '',
+    level: 'Beginner',
+    joined: new Date().toISOString(),
+    streak: 0,
+    sessionsCompleted: 0,
+  }
+  await saveUser(kv, user)
+  const { passwordHash: _, ...safeUser } = user
+  return c.json({ ok: true, user: safeUser })
+})
+
 // GET /api/admin/payments — all payments with status
 app.get('/api/admin/payments', async (c) => {
   const authErr = await requireAdminAPI(c)
