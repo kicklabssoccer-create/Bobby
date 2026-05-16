@@ -30,14 +30,14 @@ export function adminSettingsPage(): string {
         <div class="bg-accent-600/8 border border-accent-600/20 rounded-xl p-4 flex items-start gap-3">
           <i class="fas fa-info-circle text-accent-400 mt-0.5"></i>
           <div class="text-accent-300 text-sm">
-            Current admin login: <strong class="font-mono text-white">${ADMIN_USERNAME}</strong>
+            Current admin login: <strong class="font-mono text-white">kicklabs.soccer@gmail.com</strong>
             &nbsp;/&nbsp; <strong class="font-mono text-white">KickLab@2026!</strong>
           </div>
         </div>
 
         <div>
-          <label class="text-slate-400 text-xs font-semibold uppercase tracking-wider block mb-1.5">Admin Username</label>
-          <input type="text" id="cfg-username" value="${ADMIN_USERNAME}"
+          <label class="text-slate-400 text-xs font-semibold uppercase tracking-wider block mb-1.5">Admin Email</label>
+          <input type="email" id="cfg-username" value="kicklabs.soccer@gmail.com"
                  class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm"/>
         </div>
 
@@ -251,7 +251,7 @@ export function adminSettingsPage(): string {
       <div class="p-5 space-y-3">
         <div class="flex justify-between text-sm">
           <span class="text-slate-400">Logged in as</span>
-          <span class="text-white font-medium font-mono">${ADMIN_USERNAME}</span>
+          <span class="text-white font-medium font-mono text-xs">kicklabs.soccer@gmail.com</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-slate-400">Role</span>

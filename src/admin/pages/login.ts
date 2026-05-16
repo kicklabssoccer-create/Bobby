@@ -68,19 +68,19 @@ export function adminLoginPage(error?: string) {
 
       <form method="POST" action="/admin/login" id="admin-login-form">
         <div class="space-y-4 mb-6">
-          <!-- Username -->
+          <!-- Email -->
           <div>
-            <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1.5">Username</label>
+            <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1.5">Email</label>
             <div class="relative">
               <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
-                <i class="fas fa-user text-sm"></i>
+                <i class="fas fa-envelope text-sm"></i>
               </div>
               <input
-                type="text"
+                type="email"
                 name="username"
                 id="username"
-                placeholder="admin username"
-                autocomplete="username"
+                placeholder="admin@kicklab.io"
+                autocomplete="email"
                 required
                 class="w-full bg-[#0f172a] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white text-sm placeholder-slate-600 transition-all"
               />

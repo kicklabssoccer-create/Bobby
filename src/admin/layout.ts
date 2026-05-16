@@ -139,7 +139,7 @@ export function adminShell(opts: {
         <i class="fas fa-user-shield text-accent-400 text-xs"></i>
       </div>
       <div class="min-w-0">
-        <div class="text-white text-xs font-semibold truncate">kicklab_admin</div>
+        <div class="text-white text-xs font-semibold truncate">kicklabs.soccer@gmail.com</div>
         <div class="text-slate-500 text-[10px]">Super Admin</div>
       </div>
     </div>

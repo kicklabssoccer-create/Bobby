@@ -294,7 +294,7 @@ export function homePage() {
 </section>
 
 <!-- VIDEO MODAL -->
-<div id="video-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeVideoModal()">
+<div id="video-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeVideoModal()">
   <div class="bg-surface border border-white/10 rounded-2xl overflow-hidden w-full max-w-3xl mx-4">
     <div class="flex items-center justify-between p-4 border-b border-white/10">
       <h3 id="modal-video-title" class="text-white font-semibold text-sm pr-4 line-clamp-1"></h3>
@@ -310,15 +310,13 @@ export function homePage() {
 function openVideoModal(ytId, title) {
   document.getElementById('modal-iframe').src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1';
   document.getElementById('modal-video-title').textContent = title;
-  const modal = document.getElementById('video-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('video-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 function closeVideoModal() {
   document.getElementById('modal-iframe').src = '';
-  const modal = document.getElementById('video-modal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
+  document.getElementById('video-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
 </script>

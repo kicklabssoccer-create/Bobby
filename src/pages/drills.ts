@@ -88,7 +88,7 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
 </section>
 
 <!-- Drill Detail Modal -->
-<div id="drill-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeDrillModal()">
+<div id="drill-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeDrillModal()">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-xl mx-4 overflow-y-auto" style="max-height:90vh">
     <div class="flex items-center justify-between p-5 border-b border-white/10">
       <div>
@@ -118,7 +118,7 @@ export function drillsPage(query: { level?: string; cat?: string; drill?: string
 </div>
 
 <!-- Upgrade Prompt Modal -->
-<div id="upgrade-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeUpgradeModal()">
+<div id="upgrade-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeUpgradeModal()">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-sm mx-4 p-8 text-center">
     <div class="text-5xl mb-4">🔒</div>
     <h3 class="font-oswald text-2xl font-bold text-white mb-2">Premium Drill</h3>
@@ -185,27 +185,25 @@ function openDrill(id) {
     '<li class="flex items-start gap-2 text-sm"><i class="fas fa-lightbulb text-yellow-400 text-xs mt-0.5 flex-shrink-0"></i><span class="text-gray-300">' + t + '</span></li>'
   ).join('');
   
-  const modal = document.getElementById('drill-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('drill-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeDrillModal() {
-  document.getElementById('drill-modal').classList.add('hidden');
-  document.getElementById('drill-modal').classList.remove('flex');
+  document.getElementById('drill-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function showUpgradePrompt() {
   const user = JSON.parse(localStorage.getItem('kicklab_user') || 'null');
-  if (user && user.plan && user.plan !== 'free') return; // show content for paid users
-  const modal = document.getElementById('upgrade-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  if (user && user.plan && user.plan !== 'free') return;
+  document.getElementById('upgrade-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeUpgradeModal() {
-  document.getElementById('upgrade-modal').classList.add('hidden');
-  document.getElementById('upgrade-modal').classList.remove('flex');
+  document.getElementById('upgrade-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // Show/hide free notice based on auth

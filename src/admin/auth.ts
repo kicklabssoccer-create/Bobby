@@ -4,7 +4,7 @@
 // Password : KickLab@2026!
 // ──────────────────────────────────────
 
-export const ADMIN_USERNAME = 'kicklab_admin'
+export const ADMIN_USERNAME = 'kicklabs.soccer@gmail.com'
 export const ADMIN_PASSWORD = 'KickLab@2026!'
 export const SESSION_COOKIE = 'kl_admin_session'
 export const SESSION_SECRET = 'kicklab-admin-secret-2026-xk9p'

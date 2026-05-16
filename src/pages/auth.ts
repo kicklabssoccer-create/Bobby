@@ -79,7 +79,7 @@ export function loginPage() {
 </section>
 
 <!-- Forgot Password Modal -->
-<div id="forgot-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden">
+<div id="forgot-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-sm mx-4 p-8 text-center">
     <i class="fas fa-envelope text-accent-400 text-3xl mb-4"></i>
     <h3 class="font-oswald text-2xl font-bold text-white mb-2">Reset Password</h3>
@@ -144,12 +144,13 @@ function togglePassword(inputId, btn) {
 }
 
 function showForgotPassword() {
-  document.getElementById('forgot-modal').classList.remove('hidden');
-  document.getElementById('forgot-modal').classList.add('flex');
+  document.getElementById('forgot-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeForgot() {
-  document.getElementById('forgot-modal').classList.add('hidden');
+  document.getElementById('forgot-modal').style.display = 'none';
+  document.body.style.overflow = '';
   document.getElementById('forgot-modal').classList.remove('flex');
 }
 

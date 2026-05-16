@@ -200,7 +200,7 @@ export function pricingPage() {
 </section>
 
 <!-- Checkout Modal -->
-<div id="checkout-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeCheckout()">
+<div id="checkout-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeCheckout()">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-md mx-4 overflow-hidden">
     <div class="flex items-center justify-between p-5 border-b border-white/10">
       <h3 class="text-white font-bold text-lg" id="checkout-title">Subscribe</h3>
@@ -253,14 +253,13 @@ function openCheckout(plan) {
   document.getElementById('checkout-plan-info').innerHTML = 
     '<div class="flex items-center justify-between"><span class="text-gray-300 text-sm">' + p.name + ' Plan (' + currentBilling + ')</span><span class="font-bold text-white">' + price + '/mo</span></div>' +
     '<div class="mt-1 text-gray-600 text-xs">7-day free trial included — charged after trial ends</div>';
-  const modal = document.getElementById('checkout-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('checkout-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeCheckout() {
-  document.getElementById('checkout-modal').classList.add('hidden');
-  document.getElementById('checkout-modal').classList.remove('flex');
+  document.getElementById('checkout-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function completeCheckout() {

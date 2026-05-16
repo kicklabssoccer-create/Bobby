@@ -141,7 +141,7 @@ export function videosPage() {
 </section>
 
 <!-- Video Modal -->
-<div id="video-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeVideoModal()">
+<div id="video-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeVideoModal()">
   <div class="bg-surface border border-white/10 rounded-2xl overflow-hidden w-full max-w-3xl mx-4">
     <div class="flex items-center justify-between p-4 border-b border-white/10">
       <h3 id="modal-video-title" class="text-white font-semibold text-sm pr-4 line-clamp-1"></h3>
@@ -154,7 +154,7 @@ export function videosPage() {
 </div>
 
 <!-- Upgrade Modal -->
-<div id="video-upgrade-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center hidden" onclick="if(event.target===this)closeVideoUpgrade()">
+<div id="video-upgrade-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeVideoUpgrade()">
   <div class="bg-surface border border-white/10 rounded-2xl w-full max-w-sm mx-4 p-8 text-center">
     <div class="text-5xl mb-4">🎥</div>
     <h3 class="font-oswald text-2xl font-bold text-white mb-2">Premium Video</h3>
@@ -205,26 +205,24 @@ function applyVideoFilters() {
 function openVideoModal(ytId, title) {
   document.getElementById('modal-iframe').src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1';
   document.getElementById('modal-video-title').textContent = title;
-  const modal = document.getElementById('video-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('video-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeVideoModal() {
   document.getElementById('modal-iframe').src = '';
-  document.getElementById('video-modal').classList.add('hidden');
-  document.getElementById('video-modal').classList.remove('flex');
+  document.getElementById('video-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function showVideoUpgrade() {
-  const modal = document.getElementById('video-upgrade-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  document.getElementById('video-upgrade-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeVideoUpgrade() {
-  document.getElementById('video-upgrade-modal').classList.add('hidden');
-  document.getElementById('video-upgrade-modal').classList.remove('flex');
+  document.getElementById('video-upgrade-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // Paid user unlock
