@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "webapp",
+  "name": "kicklab",
   "compatibility_date": "2026-04-13",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
@@ -9,10 +9,7 @@
   "kv_namespaces": [
     {
       "binding": "KICKLAB_KV",
-      // For production: replace with real ID from `wrangler kv namespace create KICKLAB_KV`
-      // For local dev: wrangler pages dev uses --local which auto-creates a local SQLite KV
-      "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-      "preview_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      "id": "ff330f2426bb476db92edeba78d3fcb8"
     }
   ]
 }
