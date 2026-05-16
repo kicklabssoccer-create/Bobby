@@ -184,25 +184,27 @@ export function homePage() {
         <a href="/videos" class="text-accent-400 hover:text-accent-300 text-sm font-semibold flex items-center gap-1">View All <i class="fas fa-arrow-right text-xs"></i></a>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        ${['vJHlhFN5r1c', 'PYCxct2e0zI', 'bZoXMfNMBDE'].map((ytId, i) => {
-          const titles = ['Full Soccer Footwork Training: Beginner to Advanced', 'Best Football Drills 2024 | All Levels', 'How to Train a Group of Beginners — Full Session'];
-          const channels = ['Progressive Soccer · 2.1M views', 'Joner Football · 1.4M views', 'Joner Football · 890K views'];
-          return `<div class="bg-panel border border-white/10 rounded-2xl overflow-hidden card-hover video-thumb cursor-pointer" onclick="openVideoModal('${ytId}', '${titles[i]}')">
-            <div class="relative h-44 overflow-hidden bg-black">
-              <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${titles[i]}" class="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-100">
+        ${[
+          { query: 'soccer footwork training beginner to advanced drills', title: 'Soccer Footwork Training: Beginner to Advanced', tag: 'Ball Control', emoji: '⚽', dur: '20–25 min' },
+          { query: 'best football soccer drills 2024 all levels tutorial', title: 'Best Football Drills — All Levels', tag: 'Drills', emoji: '🎯', dur: '25–35 min' },
+          { query: 'soccer training session for beginners full workout', title: 'Full Beginner Soccer Training Session', tag: 'Training', emoji: '🏃', dur: '15–30 min' },
+        ].map(v => `
+          <div class="bg-panel border border-white/10 rounded-2xl overflow-hidden card-hover cursor-pointer group" onclick="openVideoSearch('${v.query}', '${v.title}')">
+            <div class="relative h-44 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+              <div class="text-6xl opacity-60 group-hover:opacity-80 transition-opacity">${v.emoji}</div>
               <div class="absolute inset-0 flex items-center justify-center">
-                <div class="play-btn w-12 h-12 bg-accent-600/90 rounded-full flex items-center justify-center hover:bg-accent-500 transition-all">
-                  <i class="fas fa-play text-white text-lg ml-0.5"></i>
+                <div class="play-btn w-14 h-14 bg-accent-600/90 rounded-full flex items-center justify-center hover:bg-accent-500 transition-all shadow-lg shadow-accent-600/30">
+                  <i class="fas fa-play text-white text-xl ml-1"></i>
                 </div>
               </div>
-              <div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">22:14</div>
+              <div class="absolute top-2 left-2 bg-accent-600/80 text-white text-[10px] font-bold px-2 py-0.5 rounded">${v.tag}</div>
+              <div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center gap-1"><i class="fab fa-youtube text-red-400 text-[10px]"></i> ${v.dur}</div>
             </div>
             <div class="p-4">
-              <h4 class="text-white text-sm font-semibold line-clamp-2 mb-1">${titles[i]}</h4>
-              <p class="text-gray-500 text-xs">${channels[i]}</p>
+              <h4 class="text-white text-sm font-semibold line-clamp-2 mb-1">${v.title}</h4>
+              <p class="text-gray-500 text-xs flex items-center gap-1"><i class="fab fa-youtube text-red-400"></i> Live YouTube results — always current</p>
             </div>
-          </div>`;
-        }).join('')}
+          </div>`).join('')}
       </div>
     </div>
   </div>
@@ -293,32 +295,82 @@ export function homePage() {
   </div>
 </section>
 
-<!-- VIDEO MODAL -->
-<div id="video-modal" class="fixed inset-0 z-[100] modal-overlay items-center justify-center" style="display:none" onclick="if(event.target===this)closeVideoModal()">
-  <div class="bg-surface border border-white/10 rounded-2xl overflow-hidden w-full max-w-3xl mx-4">
-    <div class="flex items-center justify-between p-4 border-b border-white/10">
-      <h3 id="modal-video-title" class="text-white font-semibold text-sm pr-4 line-clamp-1"></h3>
-      <button onclick="closeVideoModal()" class="text-gray-400 hover:text-white flex-shrink-0"><i class="fas fa-times text-lg"></i></button>
+<!-- VIDEO SEARCH MODAL -->
+<div id="video-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm items-center justify-center" style="display:none" onclick="if(event.target===this)closeVideoModal()">
+  <div class="bg-surface border border-white/10 rounded-2xl overflow-hidden w-full max-w-4xl mx-4 flex flex-col" style="max-height:90vh">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fab fa-youtube text-white text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 id="modal-video-title" class="text-white font-semibold text-sm line-clamp-1"></h3>
+          <p class="text-gray-500 text-xs">Live YouTube results — click any video to watch</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0 ml-3">
+        <a id="modal-yt-link" href="#" target="_blank" class="text-xs bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium transition-colors">
+          <i class="fab fa-youtube"></i> Open in YouTube
+        </a>
+        <button onclick="closeVideoModal()" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
-    <div class="aspect-video bg-black">
-      <iframe id="modal-iframe" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <!-- Search refinement bar -->
+    <div class="px-4 py-2 border-b border-white/5 flex-shrink-0 flex items-center gap-2 bg-midnight/50">
+      <i class="fas fa-search text-gray-500 text-xs"></i>
+      <input id="modal-search-input" type="text" placeholder="Refine your search..." 
+        class="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-600"
+        onkeydown="if(event.key==='Enter')refineSearch()">
+      <button onclick="refineSearch()" class="text-xs bg-accent-600 hover:bg-accent-500 text-white px-3 py-1 rounded-md transition-colors">Search</button>
+    </div>
+    <!-- YouTube search iframe -->
+    <div class="relative flex-1" style="min-height:480px">
+      <div id="modal-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-midnight z-10">
+        <div class="w-10 h-10 border-2 border-accent-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-gray-400 text-sm">Loading soccer videos...</p>
+      </div>
+      <iframe id="modal-iframe" 
+        width="100%" height="100%" 
+        frameborder="0"
+        style="min-height:480px"
+        onload="document.getElementById('modal-loading').style.display='none'">
+      </iframe>
     </div>
   </div>
 </div>
 
 <script>
-function openVideoModal(ytId, title) {
-  document.getElementById('modal-iframe').src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1';
+var _currentQuery = '';
+function openVideoSearch(query, title) {
+  _currentQuery = query;
+  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
+  document.getElementById('modal-iframe').src = ytUrl;
   document.getElementById('modal-video-title').textContent = title;
+  document.getElementById('modal-yt-link').href = ytUrl;
+  document.getElementById('modal-search-input').value = query;
+  document.getElementById('modal-loading').style.display = 'flex';
   document.getElementById('video-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+function refineSearch() {
+  var q = document.getElementById('modal-search-input').value.trim();
+  if (!q) return;
+  _currentQuery = q;
+  var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+  document.getElementById('modal-iframe').src = ytUrl;
+  document.getElementById('modal-yt-link').href = ytUrl;
+  document.getElementById('modal-loading').style.display = 'flex';
 }
 function closeVideoModal() {
   document.getElementById('modal-iframe').src = '';
   document.getElementById('video-modal').style.display = 'none';
   document.body.style.overflow = '';
+  document.getElementById('modal-loading').style.display = 'flex';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeVideoModal(); });
 </script>
 `
   });
