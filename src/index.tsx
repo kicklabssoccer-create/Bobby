@@ -355,7 +355,7 @@ app.post('/api/payment/initiate', async (c) => {
     let venmoUrl = ''
     if (method === 'venmo') {
       const venmoNote = encodeURIComponent(`KickLab ${plan} plan (${billing}) - ${email}`)
-      venmoUrl = `venmo://paycharge?txn=pay&recipients=kicklabs-soccer&amount=${amount}&note=${venmoNote}`
+      venmoUrl = `venmo://paycharge?txn=pay&recipients=bnick12&amount=${amount}&note=${venmoNote}`
     }
 
     return c.json({ ok: true, paymentId, venmoUrl, amount: `$${amount}`, plan, method })

@@ -179,8 +179,8 @@ export function pricingPage() {
         ${[
           ['Can I cancel at any time?',        'Yes — cancel anytime from your account settings. You keep access until the end of your billing period. No fees, no questions asked.'],
           ['Is there a free trial?',           'Yes! All paid plans include a 7-day free trial. You won\'t be charged until the trial ends.'],
-          ['How do I pay?',                    'We accept Venmo. It\'s fast, easy, and secure. Just select your plan, send the payment to @kicklabs-soccer on Venmo, paste your transaction ID, and we\'ll activate your plan within a few hours.'],
-          ['How does the Venmo process work?', 'Click a plan, create your account, then send the exact amount to @kicklabs-soccer on Venmo with the note shown. Copy your Venmo transaction ID, paste it into the form, and submit. An admin verifies and activates your plan — usually within 2–4 hours.'],
+          ['How do I pay?',                    'We accept Venmo. It\'s fast, easy, and secure. Just select your plan, send the payment to @bnick12 on Venmo, paste your transaction ID, and we\'ll activate your plan within a few hours.'],
+          ['How does the Venmo process work?', 'Click a plan, create your account, then send the exact amount to @bnick12 on Venmo with the note shown. Copy your Venmo transaction ID, paste it into the form, and submit. An admin verifies and activates your plan — usually within 2–4 hours.'],
           ['Can I upgrade or downgrade?',      'Absolutely. You can change your plan at any time. Upgrades are instant; downgrades take effect at the next billing cycle.'],
           ['Do programs work for all ages?',   'Yes! Programs are designed for players aged 8 and up. Foundation Builder is ideal for younger players; Elite is for serious adult players.'],
         ].map(([q, a], i) => `
@@ -220,7 +220,7 @@ export function pricingPage() {
         <span class="text-2xl">📱</span>
         <div>
           <p class="text-white text-sm font-semibold">Pay with Venmo</p>
-          <p class="text-gray-400 text-xs">Send payment to <span class="text-[#008CFF] font-bold">@kicklabs-soccer</span> — activated within a few hours</p>
+          <p class="text-gray-400 text-xs">Send payment to <span class="text-[#008CFF] font-bold">@bnick12</span> — activated within a few hours</p>
         </div>
       </div>
 
@@ -420,7 +420,7 @@ async function proceedToPayment() {
 
     // 3. Build Venmo instructions
     const venmoNote = encodeURIComponent('Kicklabs ' + p.name + ' Subscription');
-    const venmoDeepLink = 'venmo://paycharge?txn=pay&recipients=kicklabs-soccer&amount=' + amount + '&note=' + venmoNote;
+    const venmoDeepLink = 'venmo://paycharge?txn=pay&recipients=bnick12&amount=' + amount + '&note=' + venmoNote;
 
     document.getElementById('payment-instructions').innerHTML = \`
       <div class="bg-[#008CFF]/10 border border-[#008CFF]/30 rounded-xl p-5 text-center mb-4">
@@ -428,7 +428,7 @@ async function proceedToPayment() {
         <h4 class="text-white font-bold text-lg mb-1">Send Payment on Venmo</h4>
         <p class="text-gray-400 text-sm mb-1">Send exactly</p>
         <p class="text-white font-bold text-3xl mb-3">$\${amount}</p>
-        <p class="text-gray-400 text-sm mb-4">to <span class="text-[#008CFF] font-bold text-base">@kicklabs-soccer</span></p>
+        <p class="text-gray-400 text-sm mb-4">to <span class="text-[#008CFF] font-bold text-base">@bnick12</span></p>
         <a href="\${venmoDeepLink}"
            class="inline-flex items-center gap-2 bg-[#008CFF] hover:bg-[#0070cc] text-white font-bold px-6 py-3 rounded-xl transition-all text-sm mb-3">
           <i class="fas fa-external-link-alt"></i> Open Venmo App
@@ -438,7 +438,7 @@ async function proceedToPayment() {
       <div class="bg-panel border border-white/10 rounded-xl p-4 mb-4">
         <p class="text-gray-400 text-xs leading-relaxed">
           <strong class="text-white">Can't tap the button?</strong> Open Venmo →
-          search <strong class="text-[#008CFF]">@kicklabs-soccer</strong> →
+          search <strong class="text-[#008CFF]">@bnick12</strong> →
           send <strong class="text-white">$\${amount}</strong> →
           add note: <em>"Kicklabs \${p.name} Subscription"</em>
         </p>
